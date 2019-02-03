@@ -1,0 +1,6 @@
+type Query {
+    questions(search: String): [Question!]!
+    question(id: Int!): Question
+    getUser(id: Int!): User
+    users: [User!]!
+}
