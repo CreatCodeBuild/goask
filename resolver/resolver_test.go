@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	// "bytes"
 	"goask/core/adapter/fakeadapter"
 	"goask/value"
 	"testing"
@@ -78,7 +79,6 @@ func TestResolver(t *testing.T) {
 }
 
 func TestUser(t *testing.T) {
-
 	data := &fakeadapter.Data{}
 	query := Query{Data: data}
 	mutation := Mutation{Data: data}

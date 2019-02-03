@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"goask/core/adapter/fakeadapter"
 	"goask/graphqlhelper"
 	"goask/resolver"
@@ -21,7 +22,11 @@ func main() {
 		panic(err)
 	}
 
-	data, err := fakeadapter.NewData()
+	file, err := os.OpenFile("./data.json", os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	data, err := fakeadapter.NewData(file)
 	if err != nil {
 		panic(err)
 	}

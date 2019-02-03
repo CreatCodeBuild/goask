@@ -28,7 +28,7 @@ type ErrAnswerNotFound struct {
 }
 
 func (e *ErrAnswerNotFound) Error() string {
-	return fmt.Sprintf("question:%d not found", e.ID)
+	return fmt.Sprintf("answer:%d not found", e.ID)
 }
 
 // ErrUserIsNotAuthorOfAnswer

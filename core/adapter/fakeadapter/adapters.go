@@ -1,11 +1,12 @@
 package fakeadapter
 
 import (
+	"bytes"
+	"io"
 	"encoding/json"
 	"goask/core/adapter"
 	"goask/core/entity"
 	"io/ioutil"
-	"os"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -16,10 +17,13 @@ type Data struct {
 	questions Questions
 	answers   Answers
 	users     []entity.User
+	storage	  io.ReadWriter
 }
 
-func NewData() (Data, error) {
+func NewData(storage io.ReadWriter) (Data, error) {
 	d := Data{}
+	d.storage = storage
+
 	err := d.deserialize()
 	if err != nil {
 		return d, err
@@ -35,8 +39,11 @@ type dataSerialization struct {
 
 var _ adapter.Data = &Data{}
 
-func (d *Data) file() string {
-	return "./data.json"
+func (d *Data) getStorage() io.ReadWriter {
+	if d.storage == nil {
+		d.storage = bytes.NewBuffer(nil)
+	}
+	return d.storage
 }
 
 func (d *Data) serialize() error {
@@ -51,7 +58,7 @@ func (d *Data) serialize() error {
 		return errors.WithStack(err)
 	}
 
-	err = ioutil.WriteFile(d.file(), b, os.ModePerm)
+	_, err = d.getStorage().Write(b)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -60,15 +67,18 @@ func (d *Data) serialize() error {
 }
 
 func (d *Data) deserialize() error {
-	b, err := ioutil.ReadFile(d.file())
+	b, err := ioutil.ReadAll(d.getStorage())
 	if err != nil {
-		return err
+		return errors.WithStack(err)
+	}
+	if len(b) == 0 {
+		return nil  // empty data, normal return
 	}
 
 	data := dataSerialization{}
 	err = json.Unmarshal(b, &data)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	d.questions = data.Questions
