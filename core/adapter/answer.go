@@ -30,3 +30,13 @@ type ErrAnswerNotFound struct {
 func (e *ErrAnswerNotFound) Error() string {
 	return fmt.Sprintf("question:%d not found", e.ID)
 }
+
+// ErrUserIsNotAuthorOfAnswer
+type ErrUserIsNotAuthorOfAnswer struct {
+	AnswerID entity.ID
+	UserID   entity.ID
+}
+
+func (e *ErrUserIsNotAuthorOfAnswer) Error() string {
+	return fmt.Sprintf("user:%d is not the author of answer:%d found", e.UserID, e.AnswerID)
+}

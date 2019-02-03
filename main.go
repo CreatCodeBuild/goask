@@ -13,10 +13,9 @@ import (
 
 func main() {
 	schemas, err := graphqlhelper.ReadSchemas(
-		"./resolver/schema/graphql.schema",
-		"./resolver/schema/graphql.query",
-		"./resolver/schema/graphql.mutation",
-		"./resolver/schema/types.graphqls",
+		"./resolver/schema/schema.graphql",
+		"./resolver/schema/query.graphql",
+		"./resolver/schema/mutation.graphql",
 	)
 	if err != nil {
 		panic(err)

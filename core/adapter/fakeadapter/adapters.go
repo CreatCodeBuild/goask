@@ -205,9 +205,18 @@ func (d *Data) AcceptAnswer(AnswerID entity.ID, UserID entity.ID) (entity.Answer
 	return answer, d.serialize()
 }
 
-func (d *Data) DeleteAnswer(ANswerID entity.ID, UserID entity.ID) (entity.Answer, error) {
-	// todo
-	return entity.Answer{}, nil
+func (d *Data) DeleteAnswer(AnswerID entity.ID, UserID entity.ID) (entity.Answer, error) {
+	answer, ok := d.answers.Get(AnswerID)
+	if !ok {
+		return answer, errors.WithStack(&adapter.ErrAnswerNotFound{ID: AnswerID})
+	}
+
+	if answer.AuthorID != UserID {
+		return answer, errors.WithStack(&adapter.ErrUserIsNotAuthorOfAnswer{AnswerID: answer.ID, UserID: UserID})
+	}
+
+	d.answers.Delete(answer.ID)
+	return answer, nil
 }
 
 //
@@ -311,4 +320,13 @@ func (a *Answers) Filter(f func(entity.Answer) bool) Answers {
 		}
 	}
 	return ret
+}
+
+func (a *Answers) Delete(answerID entity.ID) {
+
+	answers := a.Filter(func(a entity.Answer) bool {
+		return a.ID != answerID
+	})
+
+	*a = answers
 }

@@ -8,4 +8,5 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/net v0.0.0-20181220203305-927f97764cc3 // indirect
+	golang.org/x/tools v0.0.0-20190202235157-7414d4c1f71c // indirect
 )
