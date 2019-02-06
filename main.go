@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"goask/core/adapter/fakeadapter"
 	"goask/graphqlhelper"
 	"goask/resolver"
@@ -22,21 +21,17 @@ func main() {
 		panic(err)
 	}
 
-	file, err := os.OpenFile("./data.json", os.O_WRONLY, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-	data, err := fakeadapter.NewData(file)
+	data, err := fakeadapter.NewData(fakeadapter.NewFileSerializer("./data.json"))
 	if err != nil {
 		panic(err)
 	}
 
 	schema, err := graphql.ParseSchema(schemas, &resolver.Root{
 		Query: resolver.Query{
-			Data: &data,
+			Data: data,
 		},
 		Mutation: resolver.Mutation{
-			Data: &data,
+			Data: data,
 		},
 	})
 	if err != nil {
