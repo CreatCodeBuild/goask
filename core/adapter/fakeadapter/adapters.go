@@ -1,27 +1,66 @@
 package fakeadapter
 
 import (
-	"bytes"
-	"io"
+	"os"
+	"io/ioutil"
 	"encoding/json"
 	"goask/core/adapter"
 	"goask/core/entity"
-	"io/ioutil"
 	"strings"
 
 	"github.com/pkg/errors"
 )
+
+type Serializer interface {
+	Serialize([]byte) error
+	Deserialize() ([]byte, error)
+}
+
+type FileSerializer struct {
+	fileName string
+}
+
+func NewFileSerializer(file string) FileSerializer {
+	return FileSerializer{fileName: file}
+}
+
+func (f FileSerializer) Serialize(b []byte) error {
+	err := ioutil.WriteFile(f.fileName, b, os.ModePerm)
+	return errors.WithStack(err)
+}
+
+func (f FileSerializer) Deserialize() ([]byte, error) {
+	b, err := ioutil.ReadFile(f.fileName)
+	return b, errors.WithStack(err)
+}
+
+type BufferSerializer struct {
+	data []byte
+}
+
+func (s BufferSerializer) Serialize(b []byte) error {
+	s.data = b
+	return nil
+}
+
+func (s BufferSerializer) Deserialize() ([]byte, error) {
+	return s.data, nil
+}
+
 
 // Data satisfied adapter.Data. It serializes to dist.
 type Data struct {
 	questions Questions
 	answers   Answers
 	users     []entity.User
-	storage	  io.ReadWriter
+	storage	  Serializer
 }
 
-func NewData(storage io.ReadWriter) (Data, error) {
-	d := Data{}
+func NewData(storage Serializer) (*Data, error) {
+	d := &Data{}
+	if storage == nil {
+		return nil, errors.New("storage == nil")
+	}
 	d.storage = storage
 
 	err := d.deserialize()
@@ -39,13 +78,6 @@ type dataSerialization struct {
 
 var _ adapter.Data = &Data{}
 
-func (d *Data) getStorage() io.ReadWriter {
-	if d.storage == nil {
-		d.storage = bytes.NewBuffer(nil)
-	}
-	return d.storage
-}
-
 func (d *Data) serialize() error {
 	data := dataSerialization{
 		Questions: d.questions,
@@ -58,21 +90,16 @@ func (d *Data) serialize() error {
 		return errors.WithStack(err)
 	}
 
-	_, err = d.getStorage().Write(b)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	return err
+	return d.storage.Serialize(b)
 }
 
 func (d *Data) deserialize() error {
-	b, err := ioutil.ReadAll(d.getStorage())
+	b, err := d.storage.Deserialize()
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	if len(b) == 0 {
-		return nil  // empty data, normal return
+		return nil
 	}
 
 	data := dataSerialization{}
@@ -226,7 +253,7 @@ func (d *Data) DeleteAnswer(AnswerID entity.ID, UserID entity.ID) (entity.Answer
 	}
 
 	d.answers.Delete(answer.ID)
-	return answer, nil
+	return answer, d.serialize()
 }
 
 //
