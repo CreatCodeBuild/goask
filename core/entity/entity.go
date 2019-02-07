@@ -1,10 +1,10 @@
 package entity
 
 type Question struct {
-	ID       ID
-	Content  string
-	AuthorID ID // The ID of the user who created it.
-	Title    string
+	ID            ID
+	Content       string
+	AuthorID      ID // The ID of the user who created it.
+	Title         string
 }
 
 type QuestionUpdate struct {
@@ -19,6 +19,23 @@ type Answer struct {
 	Content    string
 	AuthorID   ID // The ID of the user who created it.
 	Accepted   bool
+}
+
+// Vote is the vote of a question.
+type Vote struct {
+	UserID     ID
+	QuestionID ID
+	Type       VoteType // UP or DOWN
+}
+
+type VoteType string
+
+func UpVote() VoteType {
+	return "UP"
+}
+
+func DownVote() VoteType {
+	return "DOWN"
 }
 
 type User struct {

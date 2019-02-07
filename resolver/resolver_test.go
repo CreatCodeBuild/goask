@@ -82,7 +82,7 @@ func TestResolver(t *testing.T) {
 func TestUser(t *testing.T) {
 	data, err := fakeadapter.NewData(fakeadapter.BufferSerializer{})
 	require.NoError(t, err)
-	
+
 	query := Query{Data: data}
 	mutation := Mutation{Data: data}
 

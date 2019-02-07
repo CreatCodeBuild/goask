@@ -17,6 +17,8 @@ type QuestionDAO interface {
 	CreateQuestion(post entity.Question) (entity.Question, error)
 	UpdateQuestion(post entity.QuestionUpdate) (entity.Question, error)
 	DeleteQuestion(userID entity.ID, questionID entity.ID) (entity.Question, error)
+	VoteQuestion(userID entity.ID, questionID entity.ID, voteType entity.VoteType) (entity.Vote, error)
+	VoteCount(questionID entity.ID) (up, down int, err error)
 }
 
 type ErrQuestionNotFound struct {
