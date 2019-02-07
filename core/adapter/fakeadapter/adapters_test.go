@@ -3,6 +3,7 @@ package fakeadapter
 import (
 	"goask/core/adapter/adaptertest"
 	"testing"
+
 	"github.com/stretchr/testify/require"
 )
 
