@@ -121,14 +121,14 @@ func (a *QuestionVotes) Update(userID, questionID entity.ID, voteType entity.Vot
 	m := *a
 
 	vt := voteTarget{
-		userID:    userID,
+		userID:     userID,
 		questionID: questionID,
 	}
 
 	vote := entity.Vote{
 		UserID:     userID,
 		QuestionID: questionID,
-		Type: voteType,
+		Type:       voteType,
 	}
 
 	if vType, ok := m[vt]; ok {

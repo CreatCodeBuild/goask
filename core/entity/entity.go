@@ -1,10 +1,10 @@
 package entity
 
 type Question struct {
-	ID            ID
-	Content       string
-	AuthorID      ID // The ID of the user who created it.
-	Title         string
+	ID       ID
+	Content  string
+	AuthorID ID // The ID of the user who created it.
+	Title    string
 }
 
 type QuestionUpdate struct {
