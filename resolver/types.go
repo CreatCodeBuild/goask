@@ -33,6 +33,24 @@ func (q Question) Author() (User, error) {
 	return UserOne(user, q.data), err
 }
 
+func (q Question) VoteCount() (VoteCount, error) {
+	up, down, err := q.data.VoteCount(q.entity.ID)
+	return VoteCount{int32(up), int32(down)}, err
+}
+
+type VoteCount struct {
+	up int32
+	down int32
+}
+
+func (v VoteCount) Up() int32 {
+	return v.up
+}
+
+func (v VoteCount) Down() int32 {
+	return v.down
+}
+
 // Answer is the GraphQL resolver for Answer type.
 type Answer struct {
 	data   adapter.Data

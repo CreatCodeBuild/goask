@@ -146,14 +146,16 @@ func (a *QuestionVotes) Count(questionID entity.ID) (up int, down int, err error
 	up = 0
 	down = 0
 
-	for _, vType := range *a {
-		if vType == entity.UpVote() {
-			up += 1
-		} else if vType == entity.DownVote() {
-			down += 1
-		} else {
-			err = errors.Errorf("impossible, vote type is %s", vType)
-			return
+	for vTarget, vType := range *a {
+		if vTarget.questionID == questionID {
+			if vType == entity.UpVote() {
+				up++
+			} else if vType == entity.DownVote() {
+				down++
+			} else {
+				err = errors.Errorf("impossible, vote type is %s", vType)
+				return
+			}
 		}
 	}
 	return

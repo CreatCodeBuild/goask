@@ -97,6 +97,23 @@ func (m QuestionMutation) Delete(args struct{ ID int32 }) (Question, error) {
 	return QuestionOne(question, m.data), err
 }
 
+func (m QuestionMutation) Vote(args struct {
+	ID   int32
+	Type string
+}) (Question, error) {
+	if err := m.check(); err != nil {
+		return Question{}, err
+	}
+
+	_, err := m.data.VoteQuestion(m.userSession.UserID, entity.ID(args.ID), entity.VoteType(args.Type))
+	if err != nil {
+		return Question{}, err
+	}
+
+	question, err := m.data.QuestionByID(entity.ID(args.ID))
+	return QuestionOne(question, m.data), err
+}
+
 type AnswerMutation struct {
 	stdResolver
 	userSession UserSession

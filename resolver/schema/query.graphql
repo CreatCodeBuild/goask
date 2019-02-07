@@ -10,6 +10,12 @@ type Question implements Post {
     content: String!
     answers: [Answer!]!
     author: User!
+    voteCount: VoteCount!
+}
+
+type VoteCount {
+    up: Int!
+    down: Int!
 }
 
 type Answer implements Post {
