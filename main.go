@@ -2,16 +2,16 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
 	"goask/core/adapter/fakeadapter"
 	"goask/graphqlhelper"
 	"goask/resolver"
+	"io/ioutil"
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -42,11 +42,11 @@ func main() {
 	}
 
 	handler := &relay.Handler{Schema: schema}
-	
+
 	r := mux.NewRouter()
 	r.Handle("/query", handler)
 
-	r.Use(func (next http.Handler) http.Handler {
+	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			b, _ := ioutil.ReadAll(r.Body)
 			r.Body = ioutil.NopCloser(bytes.NewReader(b))
@@ -71,6 +71,6 @@ func (r *ResponseWriterLogger) Write(b []byte) (int, error) {
 	return r.rw.Write(b)
 }
 
-func (r  *ResponseWriterLogger) WriteHeader(statusCode int) {
+func (r *ResponseWriterLogger) WriteHeader(statusCode int) {
 	r.rw.WriteHeader(statusCode)
 }

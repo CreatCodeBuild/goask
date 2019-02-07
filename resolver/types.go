@@ -39,7 +39,7 @@ func (q Question) VoteCount() (VoteCount, error) {
 }
 
 type VoteCount struct {
-	up int32
+	up   int32
 	down int32
 }
 
