@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+	// Read multiple schema files and combine them
 	schemas, err := graphqlhelper.ReadSchemas(
 		"./resolver/schema/schema.graphql",
 		"./resolver/schema/query.graphql",
@@ -26,17 +27,23 @@ func main() {
 		panic(err)
 	}
 
+	// Initialize adapters
 	data, err := fakeadapter.NewData(fakeadapter.NewFileSerializer("./data.json"))
 	if err != nil {
 		panic(err)
 	}
-
 	userDAO := fakeadapter.NewUserDAO(data)
 	answerDAO := fakeadapter.NewAnswerDAO(data)
 	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+	searcher := fakeadapter.NewSearcher(data)
 
-	standardResolver := resolver.NewStdResolver(questionDAO, answerDAO, userDAO, &logger.Logger{})
+	// Initialize standard resolver with correct dependencies
+	standardResolver, err := resolver.NewStdResolver(questionDAO, answerDAO, userDAO, searcher, &logger.Logger{})
+	if err != nil {
+		panic(err)
+	}
 
+	// Initialize schema
 	schema, err := graphql.ParseSchema(schemas, &resolver.Root{
 		Query:    resolver.NewQuery(standardResolver),
 		Mutation: resolver.NewMutation(standardResolver),
@@ -45,11 +52,14 @@ func main() {
 		panic(err)
 	}
 
+	// Initialzie GraphQL Relay Server Handler
 	handler := &relay.Handler{Schema: schema}
 
+	// Initialize mux router
 	r := mux.NewRouter()
 	r.Handle("/query", handler)
 
+	// Register a logging middleware
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			b, _ := ioutil.ReadAll(r.Body)
@@ -59,7 +69,10 @@ func main() {
 		})
 	})
 
+	// Resiger the router
 	http.Handle("/", r)
+
+	// Start the server
 	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
 }
 

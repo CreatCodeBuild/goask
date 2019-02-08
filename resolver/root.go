@@ -15,20 +15,24 @@ type stdResolver struct {
 	QuestionDAO adapter.QuestionDAO
 	AnswerDAO   adapter.AnswerDAO
 	UserDAO     adapter.UserDAO
+	Searcher    adapter.Searcher
 	log         logger
 }
 
 func NewStdResolver(QuestionDAO adapter.QuestionDAO,
 	AnswerDAO adapter.AnswerDAO,
 	UserDAO adapter.UserDAO,
+	Searcher adapter.Searcher,
 	logger logger,
-) stdResolver {
-	return stdResolver{
+) (stdResolver, error) {
+	std := stdResolver{
 		QuestionDAO: QuestionDAO,
 		AnswerDAO:   AnswerDAO,
 		UserDAO:     UserDAO,
+		Searcher:    Searcher,
 		log:         logger,
 	}
+	return std, std.check()
 }
 
 func (r *stdResolver) check() error {
