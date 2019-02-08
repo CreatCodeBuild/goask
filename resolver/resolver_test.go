@@ -1,8 +1,8 @@
 package resolver
 
 import (
-	// "bytes"
 	"goask/core/adapter/fakeadapter"
+	"goask/log"
 	"goask/value"
 	"testing"
 
@@ -14,11 +14,18 @@ func TestResolver(t *testing.T) {
 	data, err := fakeadapter.NewData(fakeadapter.BufferSerializer{})
 	require.NoError(t, err)
 
+	userDAO := fakeadapter.NewUserDAO(data)
+	answerDAO := fakeadapter.NewAnswerDAO(data)
+	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+
+	standardResolver := NewStdResolver(questionDAO, answerDAO, userDAO, &log.Logger{})
+
 	// Query
-	query := Query{Data: data}
+	query := NewQuery(standardResolver)
 
 	// Mutation
-	mutation := Mutation{Data: data}
+	mutation := NewMutation(standardResolver)
+
 	qMutation, err := mutation.QuestionMutation(struct{ UserID int32 }{UserID: int32(1)})
 	require.EqualError(t, err, "user:1 not found")
 
@@ -73,7 +80,8 @@ func TestResolver(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, int32(1), question.ID())
 
-		answers := question.Answers()
+		answers, err := question.Answers()
+		require.NoError(t, err)
 		require.Equal(t, 1, len(answers))
 		require.Equal(t, "This is an answer", answers[0].Content())
 	})
@@ -83,8 +91,17 @@ func TestUser(t *testing.T) {
 	data, err := fakeadapter.NewData(fakeadapter.BufferSerializer{})
 	require.NoError(t, err)
 
-	query := Query{Data: data}
-	mutation := Mutation{Data: data}
+	userDAO := fakeadapter.NewUserDAO(data)
+	answerDAO := fakeadapter.NewAnswerDAO(data)
+	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+
+	standardResolver := NewStdResolver(questionDAO, answerDAO, userDAO, &log.Logger{})
+
+	// Query
+	query := NewQuery(standardResolver)
+
+	// Mutation
+	mutation := NewMutation(standardResolver)
 
 	user, err := query.GetUser(struct{ ID int32 }{ID: 1})
 	require.Error(t, err, "user:1 not found")

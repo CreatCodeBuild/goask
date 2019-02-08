@@ -6,7 +6,6 @@ import (
 )
 
 type AnswerDAO interface {
-	AnswersOfQuestion(QuestionID entity.ID) []entity.Answer
 	CreateAnswer(QuestionID entity.ID, Content string, AuthorID entity.ID) (entity.Answer, error)
 	AcceptAnswer(AnswerID entity.ID, UserID entity.ID) (entity.Answer, error)
 	DeleteAnswer(AnswerID entity.ID, UserID entity.ID) (entity.Answer, error)

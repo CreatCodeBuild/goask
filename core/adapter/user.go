@@ -9,7 +9,7 @@ type UserDAO interface {
 	UserByID(ID entity.ID) (entity.User, error)
 	Users() ([]entity.User, error)
 	CreateUser(name string) (entity.User, error)
-	QuestionsByUserID(ID entity.ID) ([]entity.Question, error)
+	QuestionsOfUser(UserID entity.ID) ([]entity.Question, error)
 }
 
 type ErrUserNotFound struct {
