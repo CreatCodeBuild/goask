@@ -6,9 +6,11 @@ import (
 )
 
 type UserDAO interface {
+	// CRUD
 	UserByID(ID entity.ID) (entity.User, error)
 	Users() ([]entity.User, error)
 	CreateUser(name string) (entity.User, error)
+	// Associated Questions
 	QuestionsOfUser(UserID entity.ID) ([]entity.Question, error)
 }
 

@@ -7,7 +7,6 @@ import (
 
 // QuestionDAO is the data access object for questions.
 type QuestionDAO interface {
-	Questions(search *string) ([]entity.Question, error) // should have a separte search dao?
 	// CRUD
 	QuestionByID(ID entity.ID) (entity.Question, error)
 	CreateQuestion(post entity.Question) (entity.Question, error)
@@ -20,6 +19,10 @@ type QuestionDAO interface {
 	VoteCount(questionID entity.ID) (up, down int, err error)
 	// Associated Author
 	GetAuthor(questionID entity.ID) (entity.User, error)
+}
+
+type Searcher interface {
+	Questions(search *string) ([]entity.Question, error)
 }
 
 type ErrQuestionNotFound struct {

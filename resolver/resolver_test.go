@@ -17,8 +17,10 @@ func TestResolver(t *testing.T) {
 	userDAO := fakeadapter.NewUserDAO(data)
 	answerDAO := fakeadapter.NewAnswerDAO(data)
 	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+	searcher := fakeadapter.NewSearcher(data)
 
-	standardResolver := NewStdResolver(questionDAO, answerDAO, userDAO, &log.Logger{})
+	standardResolver, err := NewStdResolver(questionDAO, answerDAO, userDAO, searcher, &log.Logger{})
+	require.NoError(t, err)
 
 	// Query
 	query := NewQuery(standardResolver)
@@ -94,8 +96,10 @@ func TestUser(t *testing.T) {
 	userDAO := fakeadapter.NewUserDAO(data)
 	answerDAO := fakeadapter.NewAnswerDAO(data)
 	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+	searcher := fakeadapter.NewSearcher(data)
 
-	standardResolver := NewStdResolver(questionDAO, answerDAO, userDAO, &log.Logger{})
+	standardResolver, err := NewStdResolver(questionDAO, answerDAO, userDAO, searcher, &log.Logger{})
+	require.NoError(t, err)
 
 	// Query
 	query := NewQuery(standardResolver)

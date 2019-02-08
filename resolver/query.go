@@ -13,7 +13,7 @@ func NewQuery(stdResolver stdResolver) Query {
 }
 
 func (q *Query) Questions(args struct{ Search *string }) ([]Question, error) {
-	questions, err := q.QuestionDAO.Questions(args.Search)
+	questions, err := q.Searcher.Questions(args.Search)
 	return QuestionAll(questions, q.stdResolver), err
 }
 
