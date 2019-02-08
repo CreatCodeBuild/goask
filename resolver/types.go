@@ -119,7 +119,7 @@ func (u User) Name() string {
 }
 
 func (u User) Questions() ([]Question, error) {
-	questions, err := u.UserDAO.QuestionsByUserID(u.entity.ID)
+	questions, err := u.UserDAO.QuestionsOfUser(u.entity.ID)
 	return QuestionAll(questions, u.stdResolver), err
 }
 

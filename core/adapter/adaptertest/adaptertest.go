@@ -66,7 +66,8 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		_, err = questionDAO.QuestionByID(1)
 		require.EqualError(t, err, "question:1 not found")
 
-		answers := answerDAO.AnswersOfQuestion(1) // The answers associated with this question should be deleted as well
+		answers, err := questionDAO.Answers(1) // The answers associated with this question should be deleted as well
+		require.NoError(t, err)
 		require.Empty(t, answers)
 	})
 

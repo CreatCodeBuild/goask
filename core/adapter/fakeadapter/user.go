@@ -35,7 +35,7 @@ func (d *UserDAO) CreateUser(name string) (entity.User, error) {
 	return user, d.data.serialize()
 }
 
-func (d *UserDAO) QuestionsByUserID(ID entity.ID) ([]entity.Question, error) {
+func (d *UserDAO) QuestionsOfUser(ID entity.ID) ([]entity.Question, error) {
 	var ret []entity.Question
 	for _, q := range d.data.questions {
 		if q.AuthorID == ID {
