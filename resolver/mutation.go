@@ -2,7 +2,6 @@ package resolver
 
 import (
 	"goask/core/entity"
-	"goask/log"
 )
 
 type Mutation struct {
@@ -34,12 +33,7 @@ func (m *Mutation) Answer(args struct{ UserID int32 }) (AnswerMutation, error) {
 	}
 
 	return AnswerMutation{
-		stdResolver: stdResolver{
-			QuestionDAO: m.QuestionDAO,
-			AnswerDAO:   m.AnswerDAO,
-			UserDAO:     m.UserDAO,
-			log:         &log.Logger{},
-		},
+		stdResolver: m.stdResolver,
 		userSession: UserSession{
 			UserID: entity.ID(args.UserID),
 		},
@@ -47,12 +41,7 @@ func (m *Mutation) Answer(args struct{ UserID int32 }) (AnswerMutation, error) {
 }
 
 func (m *Mutation) User() (UserMutation, error) {
-	return UserMutation{stdResolver: stdResolver{
-		QuestionDAO: m.QuestionDAO,
-		AnswerDAO:   m.AnswerDAO,
-		UserDAO:     m.UserDAO,
-		log:         &log.Logger{},
-	}}, nil
+	return UserMutation{stdResolver: m.stdResolver}, m.check()
 }
 
 // QuestionMutation resolves all mutations of questions.

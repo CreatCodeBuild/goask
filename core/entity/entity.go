@@ -21,23 +21,6 @@ type Answer struct {
 	Accepted   bool
 }
 
-// Vote is the vote of a question.
-type Vote struct {
-	UserID     ID
-	QuestionID ID
-	Type       VoteType // UP or DOWN
-}
-
-type VoteType string
-
-func UpVote() VoteType {
-	return "UP"
-}
-
-func DownVote() VoteType {
-	return "DOWN"
-}
-
 type User struct {
 	ID   ID
 	Name string

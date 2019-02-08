@@ -36,9 +36,10 @@ func main() {
 	answerDAO := fakeadapter.NewAnswerDAO(data)
 	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
 	searcher := fakeadapter.NewSearcher(data)
+	tagDAO := fakeadapter.NewTagDAO(data)
 
 	// Initialize standard resolver with correct dependencies
-	standardResolver, err := resolver.NewStdResolver(questionDAO, answerDAO, userDAO, searcher, &logger.Logger{})
+	standardResolver, err := resolver.NewStdResolver(questionDAO, answerDAO, userDAO, searcher, tagDAO, &logger.Logger{})
 	if err != nil {
 		panic(err)
 	}
