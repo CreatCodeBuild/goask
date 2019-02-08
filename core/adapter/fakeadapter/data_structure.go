@@ -1,7 +1,10 @@
 package fakeadapter
 
 import (
+	"encoding/json"
 	"goask/core/adapter"
+	"io/ioutil"
+	"os"
 	"strings"
 
 	"goask/core/entity"
@@ -11,6 +14,110 @@ import (
 
 func match(s1, s2 string) bool {
 	return strings.Contains(s1, s2)
+}
+
+// Serializer: here in this file the implementer is defined in the same pkg. This is a bad practice. But it is ok for now.
+type Serializer interface {
+	Serialize([]byte) error
+	Deserialize() ([]byte, error)
+}
+
+// FileSerializer implements Serializer with file io.
+type FileSerializer struct {
+	fileName string
+}
+
+func NewFileSerializer(file string) FileSerializer {
+	return FileSerializer{fileName: file}
+}
+
+func (f FileSerializer) Serialize(b []byte) error {
+	err := ioutil.WriteFile(f.fileName, b, os.ModePerm)
+	return errors.WithStack(err)
+}
+
+func (f FileSerializer) Deserialize() ([]byte, error) {
+	b, err := ioutil.ReadFile(f.fileName)
+	return b, errors.WithStack(err)
+}
+
+type BufferSerializer struct {
+	data []byte
+}
+
+func (s BufferSerializer) Serialize(b []byte) error {
+	s.data = b
+	return nil
+}
+
+func (s BufferSerializer) Deserialize() ([]byte, error) {
+	return s.data, nil
+}
+
+// Data holds all data.
+type Data struct {
+	questions     Questions
+	questionVotes QuestionVotes
+	answers       Answers
+	users         Users
+	storage       Serializer
+}
+
+func NewData(storage Serializer) (*Data, error) {
+	d := &Data{}
+	if storage == nil {
+		return nil, errors.New("storage == nil")
+	}
+	d.storage = storage
+	d.questionVotes = make(QuestionVotes)
+
+	err := d.deserialize()
+	if err != nil {
+		return d, err
+	}
+	return d, nil
+}
+
+type dataSerialization struct {
+	Questions Questions
+	Answers   Answers
+	Users     []entity.User
+}
+
+func (d *Data) serialize() error {
+	data := dataSerialization{
+		Questions: d.questions,
+		Answers:   d.answers,
+		Users:     d.users,
+	}
+
+	b, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return d.storage.Serialize(b)
+}
+
+func (d *Data) deserialize() error {
+	b, err := d.storage.Deserialize()
+	if err != nil {
+		return err
+	}
+	if len(b) == 0 {
+		return nil
+	}
+
+	data := dataSerialization{}
+	err = json.Unmarshal(b, &data)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	d.questions = data.Questions
+	d.answers = data.Answers
+	d.users = data.Users
+	return nil
 }
 
 type Users []entity.User

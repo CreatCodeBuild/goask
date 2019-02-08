@@ -12,6 +12,8 @@ import (
 	"github.com/gorilla/mux"
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
+
+	logger "goask/log"
 )
 
 func main() {
@@ -29,13 +31,15 @@ func main() {
 		panic(err)
 	}
 
+	userDAO := fakeadapter.NewUserDAO(data)
+	answerDAO := fakeadapter.NewAnswerDAO(data)
+	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+
+	standardResolver := resolver.NewStdResolver(questionDAO, answerDAO, userDAO, &logger.Logger{})
+
 	schema, err := graphql.ParseSchema(schemas, &resolver.Root{
-		Query: resolver.Query{
-			Data: data,
-		},
-		Mutation: resolver.Mutation{
-			Data: data,
-		},
+		Query:    resolver.NewQuery(standardResolver),
+		Mutation: resolver.NewMutation(standardResolver),
 	})
 	if err != nil {
 		panic(err)

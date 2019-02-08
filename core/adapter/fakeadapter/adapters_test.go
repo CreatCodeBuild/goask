@@ -10,5 +10,9 @@ import (
 func Test(t *testing.T) {
 	data, err := NewData(BufferSerializer{})
 	require.NoError(t, err)
-	adaptertest.Data(t, data)
+
+	userDAO := UserDAO{data: data}
+	questionDAO := QuestionDAO{data: data, userDAO: &userDAO}
+	answerDAO := AnswerDAO{data: data}
+	adaptertest.All(t, &questionDAO, &answerDAO, &userDAO)
 }

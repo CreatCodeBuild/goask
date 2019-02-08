@@ -5,12 +5,7 @@ import (
 	"goask/core/entity"
 )
 
-type Data interface {
-	QuestionDAO
-	AnswerDAO
-	UserDAO
-}
-
+// QuestionDAO is the data access object for questions.
 type QuestionDAO interface {
 	Questions(search *string) ([]entity.Question, error)
 	QuestionByID(ID entity.ID) (entity.Question, error)
@@ -19,6 +14,8 @@ type QuestionDAO interface {
 	DeleteQuestion(userID entity.ID, questionID entity.ID) (entity.Question, error)
 	VoteQuestion(userID entity.ID, questionID entity.ID, voteType entity.VoteType) (entity.Vote, error)
 	VoteCount(questionID entity.ID) (up, down int, err error)
+	Answers(questionID entity.ID) ([]entity.Answer, error)
+	GetAuthor(questionID entity.ID) (entity.User, error)
 }
 
 type ErrQuestionNotFound struct {

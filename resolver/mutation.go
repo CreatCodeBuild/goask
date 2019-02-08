@@ -1,26 +1,26 @@
 package resolver
 
 import (
-	"goask/core/adapter"
 	"goask/core/entity"
 	"goask/log"
 )
 
 type Mutation struct {
-	Data adapter.Data
+	stdResolver
+}
+
+func NewMutation(stdResolver stdResolver) Mutation {
+	return Mutation{stdResolver}
 }
 
 func (m *Mutation) QuestionMutation(args struct{ UserID int32 }) (QuestionMutation, error) {
-	_, err := m.Data.UserByID(entity.ID(args.UserID))
+	_, err := m.UserDAO.UserByID(entity.ID(args.UserID))
 	if err != nil {
 		return QuestionMutation{}, err
 	}
 
 	return QuestionMutation{
-		stdResolver: stdResolver{
-			data: m.Data,
-			log:  &log.Logger{},
-		},
+		stdResolver: m.stdResolver,
 		userSession: UserSession{
 			UserID: entity.ID(args.UserID),
 		},
@@ -28,15 +28,17 @@ func (m *Mutation) QuestionMutation(args struct{ UserID int32 }) (QuestionMutati
 }
 
 func (m *Mutation) Answer(args struct{ UserID int32 }) (AnswerMutation, error) {
-	_, err := m.Data.UserByID(entity.ID(args.UserID))
+	_, err := m.UserDAO.UserByID(entity.ID(args.UserID))
 	if err != nil {
 		return AnswerMutation{}, err
 	}
 
 	return AnswerMutation{
 		stdResolver: stdResolver{
-			data: m.Data,
-			log:  &log.Logger{},
+			QuestionDAO: m.QuestionDAO,
+			AnswerDAO:   m.AnswerDAO,
+			UserDAO:     m.UserDAO,
+			log:         &log.Logger{},
 		},
 		userSession: UserSession{
 			UserID: entity.ID(args.UserID),
@@ -46,8 +48,10 @@ func (m *Mutation) Answer(args struct{ UserID int32 }) (AnswerMutation, error) {
 
 func (m *Mutation) User() (UserMutation, error) {
 	return UserMutation{stdResolver: stdResolver{
-		data: m.Data,
-		log:  &log.Logger{},
+		QuestionDAO: m.QuestionDAO,
+		AnswerDAO:   m.AnswerDAO,
+		UserDAO:     m.UserDAO,
+		log:         &log.Logger{},
 	}}, nil
 }
 
@@ -63,7 +67,7 @@ func (m QuestionMutation) Create(args struct{ Title, Content string }) (Question
 		return Question{}, err
 	}
 
-	q, err := m.data.CreateQuestion(
+	q, err := m.QuestionDAO.CreateQuestion(
 		entity.Question{
 			Title:    args.Title,
 			Content:  args.Content,
@@ -71,7 +75,7 @@ func (m QuestionMutation) Create(args struct{ Title, Content string }) (Question
 		},
 	)
 
-	return QuestionOne(q, m.data), err
+	return QuestionOne(q, m.stdResolver), err
 }
 
 // Update updates a question
@@ -81,11 +85,11 @@ func (m QuestionMutation) Update(input QuestionInput) (Question, error) {
 	}
 
 	input.QuestionUpdate.ID = entity.ID(input.ID)
-	q, err := m.data.UpdateQuestion(input.QuestionUpdate)
+	q, err := m.QuestionDAO.UpdateQuestion(input.QuestionUpdate)
 	if err != nil {
 		m.log.Error(err)
 	}
-	return QuestionOne(q, m.data), err
+	return QuestionOne(q, m.stdResolver), err
 }
 
 func (m QuestionMutation) Delete(args struct{ ID int32 }) (Question, error) {
@@ -93,8 +97,8 @@ func (m QuestionMutation) Delete(args struct{ ID int32 }) (Question, error) {
 		return Question{}, err
 	}
 
-	question, err := m.data.DeleteQuestion(entity.ID(m.userSession.UserID), entity.ID(args.ID))
-	return QuestionOne(question, m.data), err
+	question, err := m.QuestionDAO.DeleteQuestion(entity.ID(m.userSession.UserID), entity.ID(args.ID))
+	return QuestionOne(question, m.stdResolver), err
 }
 
 func (m QuestionMutation) Vote(args struct {
@@ -105,13 +109,13 @@ func (m QuestionMutation) Vote(args struct {
 		return Question{}, err
 	}
 
-	_, err := m.data.VoteQuestion(m.userSession.UserID, entity.ID(args.ID), entity.VoteType(args.Type))
+	_, err := m.QuestionDAO.VoteQuestion(m.userSession.UserID, entity.ID(args.ID), entity.VoteType(args.Type))
 	if err != nil {
 		return Question{}, err
 	}
 
-	question, err := m.data.QuestionByID(entity.ID(args.ID))
-	return QuestionOne(question, m.data), err
+	question, err := m.QuestionDAO.QuestionByID(entity.ID(args.ID))
+	return QuestionOne(question, m.stdResolver), err
 }
 
 type AnswerMutation struct {
@@ -124,11 +128,11 @@ func (m AnswerMutation) Create(args AnswerCreationInput) (Answer, error) {
 		return Answer{}, err
 	}
 
-	answer, err := m.data.CreateAnswer(entity.ID(args.QuestionID), args.Content, m.userSession.UserID)
+	answer, err := m.AnswerDAO.CreateAnswer(entity.ID(args.QuestionID), args.Content, m.userSession.UserID)
 	if err != nil {
 		m.log.Error(err)
 	}
-	return Answer{entity: answer, data: m.data}, err
+	return AnswerOne(answer, m.stdResolver), err
 }
 
 func (m AnswerMutation) Accept(args struct{ AnswerID int32 }) (Answer, error) {
@@ -136,8 +140,8 @@ func (m AnswerMutation) Accept(args struct{ AnswerID int32 }) (Answer, error) {
 		return Answer{}, err
 	}
 
-	an, err := m.data.AcceptAnswer(entity.ID(args.AnswerID), m.userSession.UserID)
-	return AnswerOne(an, m.data), err
+	an, err := m.AnswerDAO.AcceptAnswer(entity.ID(args.AnswerID), m.userSession.UserID)
+	return AnswerOne(an, m.stdResolver), err
 }
 
 func (m AnswerMutation) Delete(args struct{ AnswerID int32 }) (Answer, error) {
@@ -145,8 +149,8 @@ func (m AnswerMutation) Delete(args struct{ AnswerID int32 }) (Answer, error) {
 		return Answer{}, err
 	}
 
-	an, err := m.data.DeleteAnswer(entity.ID(args.AnswerID), m.userSession.UserID)
-	return AnswerOne(an, m.data), err
+	an, err := m.AnswerDAO.DeleteAnswer(entity.ID(args.AnswerID), m.userSession.UserID)
+	return AnswerOne(an, m.stdResolver), err
 }
 
 type UserMutation struct {
@@ -158,8 +162,8 @@ func (m UserMutation) Create(args struct{ Name string }) (User, error) {
 		return User{}, err
 	}
 
-	user, err := m.data.CreateUser(args.Name)
-	return UserOne(user, m.data), err
+	user, err := m.UserDAO.CreateUser(args.Name)
+	return UserOne(user, m.stdResolver), err
 }
 
 type logger interface {

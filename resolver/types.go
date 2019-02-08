@@ -1,13 +1,12 @@
 package resolver
 
 import (
-	"goask/core/adapter"
 	"goask/core/entity"
 )
 
 // Question is the GraphQL resolver for Question type.
 type Question struct {
-	data   adapter.Data // todo: let's think about the scope control here
+	stdResolver
 	entity entity.Question
 }
 
@@ -23,18 +22,18 @@ func (q Question) Content() string {
 	return string(q.entity.Content)
 }
 
-func (q Question) Answers() []Answer {
-	answers := q.data.AnswersOfQuestion(q.entity.ID)
-	return AnswerAll(answers, q.data)
+func (q Question) Answers() ([]Answer, error) {
+	answers, err := q.QuestionDAO.Answers(q.entity.ID)
+	return AnswerAll(answers, q.stdResolver), err
 }
 
 func (q Question) Author() (User, error) {
-	user, err := q.data.UserByID(q.entity.AuthorID)
-	return UserOne(user, q.data), err
+	user, err := q.QuestionDAO.GetAuthor(q.entity.ID)
+	return UserOne(user, q.stdResolver), err
 }
 
 func (q Question) VoteCount() (VoteCount, error) {
-	up, down, err := q.data.VoteCount(q.entity.ID)
+	up, down, err := q.QuestionDAO.VoteCount(q.entity.ID)
 	return VoteCount{int32(up), int32(down)}, err
 }
 
@@ -53,7 +52,7 @@ func (v VoteCount) Down() int32 {
 
 // Answer is the GraphQL resolver for Answer type.
 type Answer struct {
-	data   adapter.Data
+	stdResolver
 	entity entity.Answer
 }
 
@@ -66,27 +65,27 @@ func (a Answer) Content() string {
 }
 
 func (a Answer) Question() (Question, error) {
-	question, err := a.data.QuestionByID(a.entity.QuestionID)
-	return QuestionOne(question, a.data), err
+	question, err := a.QuestionDAO.QuestionByID(a.entity.QuestionID)
+	return QuestionOne(question, a.stdResolver), err
 }
 
 func (a Answer) Author() (User, error) {
-	user, err := a.data.UserByID(a.entity.AuthorID)
-	return UserOne(user, a.data), err
+	user, err := a.UserDAO.UserByID(a.entity.AuthorID)
+	return UserOne(user, a.stdResolver), err
 }
 
 func (a Answer) Accepted() bool {
 	return a.entity.Accepted
 }
 
-func QuestionOne(question entity.Question, data adapter.Data) Question {
+func QuestionOne(question entity.Question, data stdResolver) Question {
 	return Question{
-		entity: question,
-		data:   data,
+		entity:      question,
+		stdResolver: data,
 	}
 }
 
-func QuestionAll(questions []entity.Question, data adapter.Data) []Question {
+func QuestionAll(questions []entity.Question, data stdResolver) []Question {
 	ret := make([]Question, len(questions))
 	for i, question := range questions {
 		ret[i] = QuestionOne(question, data)
@@ -94,11 +93,11 @@ func QuestionAll(questions []entity.Question, data adapter.Data) []Question {
 	return ret
 }
 
-func AnswerOne(a entity.Answer, data adapter.Data) Answer {
-	return Answer{entity: a, data: data}
+func AnswerOne(a entity.Answer, data stdResolver) Answer {
+	return Answer{entity: a, stdResolver: data}
 }
 
-func AnswerAll(as []entity.Answer, data adapter.Data) []Answer {
+func AnswerAll(as []entity.Answer, data stdResolver) []Answer {
 	answers := make([]Answer, len(as))
 	for i, a := range as {
 		answers[i] = AnswerOne(a, data)
@@ -107,8 +106,8 @@ func AnswerAll(as []entity.Answer, data adapter.Data) []Answer {
 }
 
 type User struct {
+	stdResolver
 	entity entity.User
-	data   adapter.Data
 }
 
 func (u User) ID() int32 {
@@ -120,15 +119,15 @@ func (u User) Name() string {
 }
 
 func (u User) Questions() ([]Question, error) {
-	questions, err := u.data.QuestionsByUserID(u.entity.ID)
-	return QuestionAll(questions, u.data), err
+	questions, err := u.UserDAO.QuestionsByUserID(u.entity.ID)
+	return QuestionAll(questions, u.stdResolver), err
 }
 
-func UserOne(user entity.User, data adapter.Data) User {
-	return User{entity: user, data: data}
+func UserOne(user entity.User, stdResolver stdResolver) User {
+	return User{entity: user, stdResolver: stdResolver}
 }
 
-func UserAll(users []entity.User, data adapter.Data) []User {
+func UserAll(users []entity.User, data stdResolver) []User {
 	ret := make([]User, len(users))
 	for i, user := range users {
 		ret[i] = UserOne(user, data)
