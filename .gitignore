@@ -11,5 +11,4 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Data
-*.json
+# if want to ignore json data file, use their parent dir
