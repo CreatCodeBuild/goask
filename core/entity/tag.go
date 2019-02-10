@@ -5,6 +5,12 @@ type Tag string
 
 type TagSet map[Tag]struct{}
 
+func NewTagSet(elements ...Tag) TagSet {
+	set := TagSet{}
+	set.Add(elements...)
+	return set
+}
+
 func (set TagSet) Contains(element Tag) bool {
 	_, ok := set[element]
 	return ok

@@ -16,6 +16,12 @@ type QuestionUpdate struct {
 
 type QuestionSet map[Question]struct{}
 
+func NewQuestionSet(elements ...Question) QuestionSet {
+	set := QuestionSet{}
+	set.Add(elements...)
+	return set
+}
+
 func (set QuestionSet) Contains(element Question) bool {
 	_, ok := set[element]
 	return ok
