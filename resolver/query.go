@@ -29,7 +29,7 @@ func (q *Query) GetUser(args struct{ ID int32 }) (*User, error) {
 		return nil, err
 	}
 	userResolver := UserOne(user, q.stdResolver)
-	return &userResolver, nil
+	return &userResolver, q.check()
 }
 
 func (q *Query) Users() ([]User, error) {

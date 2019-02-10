@@ -25,7 +25,7 @@ func (d *QuestionDAO) QuestionByID(ID entity.ID) (entity.Question, error) {
 	return entity.Question{}, errors.WithStack(&adapter.ErrQuestionNotFound{ID: ID})
 }
 
-func (d *QuestionDAO) CreateQuestion(q entity.Question) (entity.Question, error) {
+func (d *QuestionDAO) CreateQuestion(q entity.Question, tags []entity.Tag) (entity.Question, error) {
 	_, err := d.userDAO.UserByID(q.AuthorID)
 	if err != nil {
 		return entity.Question{}, err
@@ -33,6 +33,8 @@ func (d *QuestionDAO) CreateQuestion(q entity.Question) (entity.Question, error)
 
 	q.ID = entity.ID(len(d.data.questions) + 1)
 	d.data.questions = append(d.data.questions, q)
+	d.data.tags.UpdateQuestion(q.ID, tags)
+
 	return d.data.questions[len(d.data.questions)-1], d.data.serialize()
 }
 
@@ -47,6 +49,9 @@ func (d *QuestionDAO) UpdateQuestion(p entity.QuestionUpdate) (entity.Question, 
 			}
 			if p.Title != nil {
 				q.Title = *p.Title
+			}
+			if p.Tags != nil {
+				d.data.tags.UpdateQuestion(p.ID, p.Tags)
 			}
 			d.data.questions[i] = q
 			return q, d.data.serialize()
@@ -126,23 +131,6 @@ func (d *QuestionDAO) GetAuthor(questionID entity.ID) (entity.User, error) {
 	return user, nil
 }
 
-type Searcher struct {
-	data *Data
-}
-
-func NewSearcher(data *Data) *Searcher {
-	return &Searcher{data}
-}
-
-func (d *Searcher) Questions(search *string) ([]entity.Question, error) {
-	if search == nil {
-		return d.data.questions, nil
-	}
-	ret := make([]entity.Question, 0)
-	for _, q := range d.data.questions {
-		if match(q.Content, *search) {
-			ret = append(ret, q)
-		}
-	}
-	return ret, nil
+func (d *QuestionDAO) Tags(questionID entity.ID) (entity.TagSet, error) {
+	return d.data.tags.GetTagsOfQuestion(questionID), nil
 }

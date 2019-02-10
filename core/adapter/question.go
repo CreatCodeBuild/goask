@@ -9,7 +9,7 @@ import (
 type QuestionDAO interface {
 	// CRUD
 	QuestionByID(ID entity.ID) (entity.Question, error)
-	CreateQuestion(post entity.Question) (entity.Question, error)
+	CreateQuestion(post entity.Question, tags []entity.Tag) (entity.Question, error) // todo: change the signature to support tag
 	UpdateQuestion(post entity.QuestionUpdate) (entity.Question, error)
 	DeleteQuestion(userID entity.ID, questionID entity.ID) (entity.Question, error)
 	// Associated Answers
@@ -19,6 +19,8 @@ type QuestionDAO interface {
 	VoteCount(questionID entity.ID) (up, down int, err error)
 	// Associated Author
 	GetAuthor(questionID entity.ID) (entity.User, error)
+	// Tags
+	Tags(questionID entity.ID) (entity.TagSet, error)
 }
 
 type Searcher interface {

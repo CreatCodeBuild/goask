@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.AnswerDAO, userDAO adapter.UserDAO) {
+func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.AnswerDAO, userDAO adapter.UserDAO, tagDAO adapter.TagDAO) {
 
 	t.Run("create questions", func(t *testing.T) {
-		_, err := questionDAO.CreateQuestion(entity.Question{})
+		_, err := questionDAO.CreateQuestion(entity.Question{}, nil)
 		require.EqualError(t, err, "user:0 not found")
 
 		user, err := userDAO.CreateUser("user 1")
@@ -21,9 +21,18 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		require.Equal(t, user.Name, "user 1")
 		require.Equal(t, user.ID, entity.ID(1))
 
-		question, err := questionDAO.CreateQuestion(entity.Question{AuthorID: 1})
+		question, err := questionDAO.CreateQuestion(entity.Question{AuthorID: 1}, nil)
 		require.NoError(t, err)
 		require.Equal(t, entity.Question{AuthorID: 1, ID: 1}, question)
+
+		t.Run("create question with tag", func(t *testing.T) {
+			q, err := questionDAO.CreateQuestion(entity.Question{AuthorID: 1}, []entity.Tag{"Go1", "Go2"})
+			require.NoError(t, err)
+
+			tags, err := questionDAO.Tags(q.ID)
+			require.NoError(t, err)
+			require.Equal(t, entity.TagSet{"Go1": struct{}{}, "Go2": struct{}{}}, tags)
+		})
 	})
 
 	t.Run("create answers", func(t *testing.T) {
@@ -75,7 +84,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		user, err := userDAO.CreateUser("user 2")
 		require.NoError(t, err)
 
-		question, err := questionDAO.CreateQuestion(entity.Question{AuthorID: user.ID})
+		question, err := questionDAO.CreateQuestion(entity.Question{AuthorID: user.ID}, nil)
 		require.NoError(t, err)
 
 		up, down, err := questionDAO.VoteCount(question.ID)
@@ -114,5 +123,50 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 				fmt.Sprintf("user:%d has voted DOWN for question:%d", user.ID, question.ID),
 				err.Error())
 		})
+	})
+
+	t.Run("tag questions", func(t *testing.T) {
+		user, err := userDAO.CreateUser("tagger")
+		require.NoError(t, err)
+
+		question1, err := questionDAO.CreateQuestion(entity.Question{AuthorID: user.ID}, nil)
+		require.NoError(t, err)
+		question2, err := questionDAO.CreateQuestion(entity.Question{AuthorID: user.ID}, nil)
+		require.NoError(t, err)
+
+		tags, err := questionDAO.Tags(question1.ID)
+		require.NoError(t, err)
+		require.Empty(t, tags)
+
+		// Tag question1 with Python, Go
+		_, err = questionDAO.UpdateQuestion(entity.QuestionUpdate{ID: question1.ID, Tags: []entity.Tag{"Python", "Go"}})
+		require.NoError(t, err)
+
+		tags, err = questionDAO.Tags(question1.ID)
+		require.NoError(t, err)
+		require.Equal(t, entity.TagSet{"Python": struct{}{}, "Go": struct{}{}}, tags)
+
+		// Tag question2 with Python
+		_, err = questionDAO.UpdateQuestion(entity.QuestionUpdate{ID: question2.ID, Tags: []entity.Tag{"Python"}})
+		require.NoError(t, err)
+
+		tags, err = questionDAO.Tags(question2.ID)
+		require.NoError(t, err)
+		require.Equal(t, entity.TagSet{"Python": struct{}{}}, tags)
+
+		// Assert tag Python has question1 and question2
+		questions, err := tagDAO.Questions("Python")
+		require.NoError(t, err)
+		require.Equal(t, entity.QuestionSet{question1: struct{}{}, question2: struct{}{}}, questions)
+
+		// Assert tag Go has question1
+		questions, err = tagDAO.Questions("Go")
+		require.NoError(t, err)
+		require.Equal(t, entity.QuestionSet{question1: struct{}{}}, questions)
+
+		// Assert tag Java has no question
+		questions, err = tagDAO.Questions("Java")
+		require.NoError(t, err)
+		require.Empty(t, questions)
 	})
 }

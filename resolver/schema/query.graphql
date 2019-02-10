@@ -11,11 +11,17 @@ type Question implements Post {
     answers: [Answer!]!
     author: User!
     voteCount: VoteCount!
+    tags: [Tag!]!
 }
 
 type VoteCount {
     up: Int!
     down: Int!
+}
+
+type Tag {
+    value: String!
+    questions: [Question!]! # all questions which has the same tag
 }
 
 type Answer implements Post {

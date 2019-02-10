@@ -12,10 +12,11 @@ type Root struct {
 }
 
 type stdResolver struct {
+	Searcher    adapter.Searcher
 	QuestionDAO adapter.QuestionDAO
 	AnswerDAO   adapter.AnswerDAO
 	UserDAO     adapter.UserDAO
-	Searcher    adapter.Searcher
+	TagDAO      adapter.TagDAO
 	log         logger
 }
 
@@ -23,6 +24,7 @@ func NewStdResolver(QuestionDAO adapter.QuestionDAO,
 	AnswerDAO adapter.AnswerDAO,
 	UserDAO adapter.UserDAO,
 	Searcher adapter.Searcher,
+	TagDAO adapter.TagDAO,
 	logger logger,
 ) (stdResolver, error) {
 	std := stdResolver{
@@ -30,6 +32,7 @@ func NewStdResolver(QuestionDAO adapter.QuestionDAO,
 		AnswerDAO:   AnswerDAO,
 		UserDAO:     UserDAO,
 		Searcher:    Searcher,
+		TagDAO:      TagDAO,
 		log:         logger,
 	}
 	return std, std.check()
@@ -44,6 +47,12 @@ func (r *stdResolver) check() error {
 	}
 	if r.UserDAO == nil {
 		return errors.New("stdResolver.UserDAO is not initialized")
+	}
+	if r.Searcher == nil {
+		return errors.New("stdResolver.Searcher is not initialized")
+	}
+	if r.TagDAO == nil {
+		return errors.New("stdResolver.TagDAO is not initialized")
 	}
 	if r.log == nil {
 		return errors.New("stdResolver.log is not initialized")
