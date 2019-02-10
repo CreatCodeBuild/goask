@@ -60,6 +60,7 @@ type Data struct {
 	questionVotes QuestionVotes
 	answers       Answers
 	users         Users
+	tags          Tags
 	storage       Serializer
 }
 
@@ -70,6 +71,9 @@ func NewData(storage Serializer) (*Data, error) {
 	}
 	d.storage = storage
 	d.questionVotes = make(QuestionVotes)
+	d.tags = Tags{
+		tags: make(questionTagSet),
+	}
 
 	err := d.deserialize()
 	if err != nil {

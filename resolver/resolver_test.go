@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"goask/core/adapter/fakeadapter"
+	"goask/core/entity"
 	"goask/log"
 	"goask/value"
 	"testing"
@@ -45,7 +46,10 @@ func TestResolver(t *testing.T) {
 	require.Equal(t, len(questions), 0)
 
 	// Create Question
-	qResolver, err := qMutation.Create(struct{ Title, Content string }{Title: "t", Content: "c"})
+	qResolver, err := qMutation.Create(struct {
+		Title, Content string
+		Tags           *[]entity.Tag
+	}{Title: "t", Content: "c"})
 	require.NoError(t, err)
 	require.Equal(t, qResolver.ID(), int32(1))
 	require.Equal(t, qResolver.Content(), "c")

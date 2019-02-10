@@ -39,5 +39,5 @@ func (q Question) VoteCount() (VoteCount, error) {
 
 func (q Question) Tags() ([]Tag, error) {
 	tags, err := q.QuestionDAO.Tags(q.entity.ID)
-	return TagAll(tags, q.stdResolver), err
+	return TagAll(tags.Slice(), q.stdResolver), err
 }

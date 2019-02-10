@@ -19,7 +19,7 @@ func (t Tag) Questions() ([]Question, error) {
 		t.stdResolver.log.Error(err)
 		return nil, err
 	}
-	return QuestionAll(questions, t.stdResolver), nil
+	return QuestionAll(questions.Slice(), t.stdResolver), nil
 }
 
 func TagOne(tag entity.Tag, stdResolver stdResolver) Tag {

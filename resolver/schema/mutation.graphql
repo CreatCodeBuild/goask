@@ -1,5 +1,5 @@
 type QuestionMutation {
-    create(title: String!, content: String!): Question!
+    create(title: String!, content: String!, tags: [String!]): Question!
     update(id: ID!, title: String, content: String): Question!
     delete(id: Int!): Question!
     vote(id: Int!, type: VoteType!): Question!

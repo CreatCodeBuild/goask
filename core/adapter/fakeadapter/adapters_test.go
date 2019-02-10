@@ -14,5 +14,7 @@ func Test(t *testing.T) {
 	userDAO := UserDAO{data: data}
 	questionDAO := QuestionDAO{data: data, userDAO: &userDAO}
 	answerDAO := AnswerDAO{data: data}
-	adaptertest.All(t, &questionDAO, &answerDAO, &userDAO)
+	tagDAO := TagDAO{data: data}
+
+	adaptertest.All(t, &questionDAO, &answerDAO, &userDAO, &tagDAO)
 }

@@ -51,9 +51,17 @@ type QuestionMutation struct {
 }
 
 // Create creates a question.
-func (m QuestionMutation) Create(args struct{ Title, Content string }) (Question, error) {
+func (m QuestionMutation) Create(args struct {
+	Title, Content string
+	Tags           *[]entity.Tag
+}) (Question, error) {
 	if err := m.check(); err != nil {
 		return Question{}, err
+	}
+
+	var tags []entity.Tag
+	if args.Tags != nil {
+		tags = *args.Tags
 	}
 
 	q, err := m.QuestionDAO.CreateQuestion(
@@ -62,6 +70,7 @@ func (m QuestionMutation) Create(args struct{ Title, Content string }) (Question
 			Content:  args.Content,
 			AuthorID: m.userSession.UserID,
 		},
+		tags,
 	)
 
 	return QuestionOne(q, m.stdResolver), err

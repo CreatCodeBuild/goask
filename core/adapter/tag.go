@@ -6,5 +6,5 @@ import (
 
 type TagDAO interface {
 	// Questions gets all questions which has this tag.
-	Questions(entity.Tag) ([]entity.Question, error)
+	Questions(entity.Tag) (entity.QuestionSet, error)
 }
