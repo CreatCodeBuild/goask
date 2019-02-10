@@ -144,7 +144,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 
 		tags, err = questionDAO.Tags(question1.ID)
 		require.NoError(t, err)
-		require.Equal(t, entity.TagSet{"Python": struct{}{}, "Go": struct{}{}}, tags)
+		require.Equal(t, entity.NewTagSet("Python", "Go"), tags)
 
 		// Tag question2 with Python
 		_, err = questionDAO.UpdateQuestion(entity.QuestionUpdate{ID: question2.ID, Tags: []entity.Tag{"Python"}})
@@ -152,17 +152,17 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 
 		tags, err = questionDAO.Tags(question2.ID)
 		require.NoError(t, err)
-		require.Equal(t, entity.TagSet{"Python": struct{}{}}, tags)
+		require.Equal(t, entity.NewTagSet("Python"), tags)
 
 		// Assert tag Python has question1 and question2
 		questions, err := tagDAO.Questions("Python")
 		require.NoError(t, err)
-		require.Equal(t, entity.QuestionSet{question1: struct{}{}, question2: struct{}{}}, questions)
+		require.Equal(t, entity.NewQuestionSet(question1, question2), questions)
 
 		// Assert tag Go has question1
 		questions, err = tagDAO.Questions("Go")
 		require.NoError(t, err)
-		require.Equal(t, entity.QuestionSet{question1: struct{}{}}, questions)
+		require.Equal(t, entity.NewQuestionSet(question1), questions)
 
 		// Assert tag Java has no question
 		questions, err = tagDAO.Questions("Java")
