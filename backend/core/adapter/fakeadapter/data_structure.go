@@ -37,6 +37,16 @@ func (f FileSerializer) Serialize(b []byte) error {
 }
 
 func (f FileSerializer) Deserialize() ([]byte, error) {
+	if _, err := os.Stat(f.fileName); os.IsNotExist(err) {
+		f, err := os.Create(f.fileName)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		err = f.Close()
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
 	b, err := ioutil.ReadFile(f.fileName)
 	return b, errors.WithStack(err)
 }
