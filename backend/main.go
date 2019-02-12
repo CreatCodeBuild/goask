@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	graphql "github.com/graph-gophers/graphql-go"
@@ -17,6 +18,9 @@ import (
 )
 
 func main() {
+	// Create application loggger
+	appLogger := &logger.Logger{}
+
 	// Read multiple schema files and combine them
 	schemas, err := graphqlhelper.ReadSchemas(
 		"./resolver/schema/schema.graphql",
@@ -24,13 +28,15 @@ func main() {
 		"./resolver/schema/mutation.graphql",
 	)
 	if err != nil {
-		panic(err)
+		appLogger.Error(err)
+		os.Exit(1)
 	}
 
 	// Initialize adapters
 	data, err := fakeadapter.NewData(fakeadapter.NewFileSerializer("./data.json"))
 	if err != nil {
-		panic(err)
+		appLogger.Error(err)
+		os.Exit(1)
 	}
 	userDAO := fakeadapter.NewUserDAO(data)
 	answerDAO := fakeadapter.NewAnswerDAO(data)
@@ -39,9 +45,10 @@ func main() {
 	tagDAO := fakeadapter.NewTagDAO(data)
 
 	// Initialize standard resolver with correct dependencies
-	standardResolver, err := resolver.NewStdResolver(questionDAO, answerDAO, userDAO, searcher, tagDAO, &logger.Logger{})
+	standardResolver, err := resolver.NewStdResolver(questionDAO, answerDAO, userDAO, searcher, tagDAO, appLogger)
 	if err != nil {
-		panic(err)
+		appLogger.Error(err)
+		os.Exit(1)
 	}
 
 	// Initialize schema
@@ -50,7 +57,8 @@ func main() {
 		Mutation: resolver.NewMutation(standardResolver),
 	})
 	if err != nil {
-		panic(err)
+		appLogger.Error(err)
+		os.Exit(1)
 	}
 
 	// Initialzie GraphQL Relay Server Handler
@@ -74,7 +82,10 @@ func main() {
 	http.Handle("/", r)
 
 	// Start the server
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
+	if err := http.ListenAndServe("0.0.0.0:8080", nil); err != nil {
+		appLogger.Error(err)
+		os.Exit(1)
+	}
 }
 
 type ResponseWriterLogger struct {
