@@ -4,14 +4,6 @@ import (
 	"goask/core/entity"
 )
 
-type Mutation struct {
-	stdResolver
-}
-
-func NewMutation(stdResolver stdResolver) Mutation {
-	return Mutation{stdResolver}
-}
-
 func (m *Mutation) QuestionMutation(args struct{ UserID int32 }) (QuestionMutation, error) {
 	_, err := m.UserDAO.UserByID(entity.ID(args.UserID))
 	if err != nil {
