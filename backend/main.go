@@ -2,13 +2,14 @@ package main
 
 import (
 	"bytes"
+	"goask/core/adapter"
 	"goask/core/adapter/fakeadapter"
 	"goask/graphqlhelper"
 	"goask/resolver"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	graphql "github.com/graph-gophers/graphql-go"
@@ -22,33 +23,21 @@ func main() {
 	appLogger := &logger.Logger{}
 
 	// Read multiple schema files and combine them
-	schemas, err := graphqlhelper.ReadSchemas(
-		"./resolver/schema/schema.graphql",
-		"./resolver/schema/query.graphql",
-		"./resolver/schema/mutation.graphql",
-	)
+	schemas, err := prepareSchmea()
 	if err != nil {
-		appLogger.Error(err)
-		os.Exit(1)
+		appLogger.ErrorExit(err)
 	}
 
 	// Initialize adapters
-	data, err := fakeadapter.NewData(fakeadapter.NewFileSerializer("./data.json"))
+	userDAO, answerDAO, questionDAO, searcher, tagDAO, err := prepareDataAccessObjects()
 	if err != nil {
-		appLogger.Error(err)
-		os.Exit(1)
+		appLogger.ErrorExit(err)
 	}
-	userDAO := fakeadapter.NewUserDAO(data)
-	answerDAO := fakeadapter.NewAnswerDAO(data)
-	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
-	searcher := fakeadapter.NewSearcher(data)
-	tagDAO := fakeadapter.NewTagDAO(data)
 
 	// Initialize standard resolver with correct dependencies
 	standardResolver, err := resolver.NewStdResolver(questionDAO, answerDAO, userDAO, searcher, tagDAO, appLogger)
 	if err != nil {
-		appLogger.Error(err)
-		os.Exit(1)
+		appLogger.ErrorExit(err)
 	}
 
 	// Initialize schema
@@ -57,10 +46,39 @@ func main() {
 		Mutation: resolver.NewMutation(standardResolver),
 	})
 	if err != nil {
-		appLogger.Error(err)
-		os.Exit(1)
+		appLogger.ErrorExit(err)
 	}
 
+	// Initialzie Server
+	server := prepareServer(schema)
+
+	// Start the server
+	if err := server.ListenAndServe(); err != nil {
+		appLogger.ErrorExit(err)
+	}
+}
+
+func prepareSchmea() (string, error) {
+	return graphqlhelper.ReadSchemas(
+		"./resolver/schema/schema.graphql",
+		"./resolver/schema/query.graphql",
+		"./resolver/schema/mutation.graphql",
+		"./resolver/schema/types.graphql",
+	)
+}
+
+func prepareDataAccessObjects() (adapter.UserDAO, adapter.AnswerDAO, adapter.QuestionDAO, adapter.Searcher, adapter.TagDAO, error) {
+	// Initialize adapters
+	data, err := fakeadapter.NewData(fakeadapter.NewFileSerializer("./data.json"))
+	userDAO := fakeadapter.NewUserDAO(data)
+	answerDAO := fakeadapter.NewAnswerDAO(data)
+	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+	searcher := fakeadapter.NewSearcher(data)
+	tagDAO := fakeadapter.NewTagDAO(data)
+	return userDAO, answerDAO, questionDAO, searcher, tagDAO, err
+}
+
+func prepareServer(schema *graphql.Schema) *http.Server {
 	// Initialzie GraphQL Relay Server Handler
 	handler := &relay.Handler{Schema: schema}
 
@@ -78,13 +96,12 @@ func main() {
 		})
 	})
 
-	// Resiger the router
-	http.Handle("/", r)
-
-	// Start the server
-	if err := http.ListenAndServe("0.0.0.0:8080", nil); err != nil {
-		appLogger.Error(err)
-		os.Exit(1)
+	return &http.Server{
+		Addr:           ":8080",
+		Handler:        r,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
 }
 

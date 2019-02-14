@@ -1,0 +1,39 @@
+interface Post {
+    id: Int!
+    content: String!
+    author: User!
+}
+
+type Question implements Post {
+    id: Int!
+    title: String!
+    content: String!
+    answers: [Answer!]!
+    author: User!
+    voteCount: VoteCount!
+    tags: [Tag!]!
+}
+
+type VoteCount {
+    up: Int!
+    down: Int!
+}
+
+type Tag {
+    value: String!
+    questions: [Question!]! # all questions which has the same tag
+}
+
+type Answer implements Post {
+    id: Int!
+    content: String!
+    question: Question!
+    author: User!
+    accepted: Boolean!
+}
+
+type User {
+    id: Int!
+    name: String!
+    questions: [Question!]!
+}

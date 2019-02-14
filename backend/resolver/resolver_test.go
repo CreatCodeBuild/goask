@@ -4,7 +4,7 @@ import (
 	"goask/core/adapter/fakeadapter"
 	"goask/core/entity"
 	"goask/log"
-	"goask/value"
+	"goask/pointer"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -61,7 +61,7 @@ func TestResolver(t *testing.T) {
 
 	// Update Question
 	update := QuestionInput{}
-	update.Content = value.String("content")
+	update.Content = pointer.String("content")
 	update.ID = 1
 	qResolver, err = qMutation.Update(update)
 	require.NoError(t, err)
