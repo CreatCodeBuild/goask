@@ -1,9 +1,14 @@
 package graphqlhelper
 
 import (
+	"context"
 	"errors"
 	"io/ioutil"
+	"log"
+	"os"
 	"strings"
+
+	"github.com/graph-gophers/graphql-go"
 )
 
 var ErrNoSchemaSupplied = errors.New("no schema files are supplied")
@@ -25,4 +30,22 @@ func ReadSchemas(files ...string) (string, error) {
 		}
 	}
 	return builder.String(), nil
+}
+
+type logger interface {
+	Printf(format string, v ...interface{})
+}
+
+type LoggableSchema struct {
+	Logger logger
+	Schema *graphql.Schema
+}
+
+func (l *LoggableSchema) Exec(ctx context.Context, queryString string, operationName string, variables map[string]interface{}) *graphql.Response {
+	if l.Logger == nil {
+		l.Logger = log.New(os.Stdout, "", log.LstdFlags)
+	}
+	resp := l.Schema.Exec(ctx, queryString, operationName, variables)
+	l.Logger.Printf("query: %s", queryString)
+	return resp
 }

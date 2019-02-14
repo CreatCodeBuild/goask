@@ -4,7 +4,7 @@ schema {
 }
 
 type Query {
-    query(userID: Int!): QueryAction!
+    action(userID: Int!): QueryAction!
 }
 
 type Mutation {

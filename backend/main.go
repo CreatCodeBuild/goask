@@ -1,19 +1,17 @@
 package main
 
 import (
-	"bytes"
+	"encoding/json"
 	"goask/core/adapter"
 	"goask/core/adapter/fakeadapter"
 	"goask/graphqlhelper"
 	"goask/resolver"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
 	graphql "github.com/graph-gophers/graphql-go"
-	"github.com/graph-gophers/graphql-go/relay"
+	"github.com/pkg/errors"
 
 	logger "goask/log"
 )
@@ -46,11 +44,11 @@ func main() {
 		Mutation: resolver.NewMutation(standardResolver),
 	})
 	if err != nil {
-		appLogger.ErrorExit(err)
+		appLogger.ErrorExit(errors.WithStack(err))
 	}
 
 	// Initialzie Server
-	server := prepareServer(schema)
+	server := prepareServer(&graphqlhelper.LoggableSchema{Schema: schema}, appLogger)
 
 	// Start the server
 	if err := server.ListenAndServe(); err != nil {
@@ -78,23 +76,13 @@ func prepareDataAccessObjects() (adapter.UserDAO, adapter.AnswerDAO, adapter.Que
 	return userDAO, answerDAO, questionDAO, searcher, tagDAO, err
 }
 
-func prepareServer(schema *graphql.Schema) *http.Server {
+func prepareServer(schema *graphqlhelper.LoggableSchema, logger *logger.Logger) *http.Server {
 	// Initialzie GraphQL Relay Server Handler
-	handler := &relay.Handler{Schema: schema}
+	handler := &Handler{Schema: schema} // probably need to reimplement a relay handler to accept a interface of Schame so that I can wrap the graphql.Schema with my logging functionality
 
 	// Initialize mux router
 	r := mux.NewRouter()
 	r.Handle("/query", handler)
-
-	// Register a logging middleware
-	r.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			b, _ := ioutil.ReadAll(r.Body)
-			r.Body = ioutil.NopCloser(bytes.NewReader(b))
-			log.Println(r.RequestURI, string(b))
-			next.ServeHTTP(&ResponseWriterLogger{w}, r)
-		})
-	})
 
 	return &http.Server{
 		Addr:           ":8080",
@@ -105,18 +93,29 @@ func prepareServer(schema *graphql.Schema) *http.Server {
 	}
 }
 
-type ResponseWriterLogger struct {
-	rw http.ResponseWriter
+// Handler is a customized relay handler which accepts a Schema object wrapper which logs.
+type Handler struct {
+	Schema *graphqlhelper.LoggableSchema
 }
 
-func (r *ResponseWriterLogger) Header() http.Header {
-	return r.rw.Header()
-}
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var params struct {
+		Query         string                 `json:"query"`
+		OperationName string                 `json:"operationName"`
+		Variables     map[string]interface{} `json:"variables"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-func (r *ResponseWriterLogger) Write(b []byte) (int, error) {
-	return r.rw.Write(b)
-}
+	response := h.Schema.Exec(r.Context(), params.Query, params.OperationName, params.Variables)
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-func (r *ResponseWriterLogger) WriteHeader(statusCode int) {
-	r.rw.WriteHeader(statusCode)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseJSON)
 }

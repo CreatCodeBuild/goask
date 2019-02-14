@@ -4,26 +4,23 @@ import (
 	"goask/core/entity"
 )
 
-type Query struct {
+type QueryAction struct {
 	stdResolver
+	userSession UserSession
 }
 
-func NewQuery(stdResolver stdResolver) Query {
-	return Query{stdResolver}
-}
-
-func (q *Query) Questions(args struct{ Search *string }) ([]Question, error) {
+func (q QueryAction) Questions(args struct{ Search *string }) ([]Question, error) {
 	questions, err := q.Searcher.Questions(args.Search)
 	return QuestionAll(questions, q.stdResolver), err
 }
 
-func (q *Query) Question(args struct{ ID int32 }) (*Question, error) {
+func (q QueryAction) Question(args struct{ ID int32 }) (*Question, error) {
 	question, err := q.QuestionDAO.QuestionByID(entity.ID(args.ID))
 	questionResolver := QuestionOne(question, q.stdResolver)
 	return &questionResolver, err
 }
 
-func (q *Query) GetUser(args struct{ ID int32 }) (*User, error) {
+func (q QueryAction) GetUser(args struct{ ID int32 }) (*User, error) {
 	user, err := q.UserDAO.UserByID(entity.ID(args.ID))
 	if err != nil {
 		return nil, err
@@ -32,7 +29,7 @@ func (q *Query) GetUser(args struct{ ID int32 }) (*User, error) {
 	return &userResolver, q.check()
 }
 
-func (q *Query) Users() ([]User, error) {
+func (q QueryAction) Users() ([]User, error) {
 	users, err := q.UserDAO.Users()
 	if err != nil {
 		return nil, err
