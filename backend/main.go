@@ -48,7 +48,7 @@ func main() {
 	}
 
 	// Initialzie Server
-	server := prepareServer(&graphqlhelper.LoggableSchema{Schema: schema}, appLogger)
+	server := prepareServer(&graphqlhelper.LoggableSchema{Schema: schema, Logger: appLogger}, appLogger)
 
 	// Start the server
 	if err := server.ListenAndServe(); err != nil {

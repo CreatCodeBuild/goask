@@ -7,6 +7,10 @@ import (
 
 type Logger struct{}
 
+func (l *Logger) Printf(format string, v ...interface{}) {
+	log.Printf(format, v...)
+}
+
 func (l *Logger) Error(err error) {
 	log.Printf("%+v\n", err)
 }
