@@ -1,22 +1,50 @@
 import { Injectable } from '@angular/core';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
+import { Observable } from 'apollo-client/util/Observable';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GraphqlService {
 
-  constructor() { }
+  constructor(
+    private apollo: Apollo
+  ) { }
 
-  queryQuestions(): Array<Question> {
-    return [{
-      id: 1,
-      title: "title 1",
-      content: "content 1"
-    },{
-      id: 2,
-      title: "title 2",
-      content: "content 2"
-    }]
+  queryQuestions() {
+    const QueryQuestions = gql`
+      query {
+        action(userID: 1) {
+          questions {
+            id
+            title
+            content
+          }
+        }
+      }
+    `;
+    let obs = this.apollo.query({
+      query: QueryQuestions
+    });
+    return obs
+  }
+
+  queryUsers() {
+    const queryUsers = gql`
+      query GetAllUserQuery{
+        action(userID:2){
+          users {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    return this.apollo.query<any>({
+      query: queryUsers
+    });
   }
 }
 

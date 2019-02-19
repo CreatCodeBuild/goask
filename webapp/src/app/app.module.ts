@@ -10,11 +10,16 @@ import { UsersComponent } from './users/users.component';
 import { Routes, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { QuestionsComponent } from './questions/questions.component';
+import { QuestionDetailComponent } from './question-detail/question-detail.component';
 
 const routes: Routes = [
   {
     path: 'users',
     component: UsersComponent
+  },
+  {
+    path: 'question/:id',
+    component: QuestionDetailComponent,
   }
 ];
 
@@ -22,7 +27,8 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     UsersComponent,
-    QuestionsComponent
+    QuestionsComponent,
+    QuestionDetailComponent
   ],
   imports: [
     BrowserModule,

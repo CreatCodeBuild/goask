@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GraphqlService, Question } from '../graphql.service'
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-questions',
@@ -8,7 +9,7 @@ import { GraphqlService, Question } from '../graphql.service'
 })
 export class QuestionsComponent implements OnInit {
 
-  private questions: Array<any>
+  private questions: Array<Question>
 
   constructor(
     private graphqlService: GraphqlService
@@ -17,11 +18,12 @@ export class QuestionsComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log("QuestionsComponent on init")
-   
-    console.log(this.graphqlService)
-
-    this.questions = this.graphqlService.queryQuestions()
+    let self = this
+    this.graphqlService.queryQuestions().subscribe({
+      next(x) { 
+        self.questions = self.questions.concat(x.data.action.questions)
+      }
+    })
   }
 
 }
