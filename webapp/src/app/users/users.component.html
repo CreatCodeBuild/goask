@@ -1,0 +1,5 @@
+<ul *ngIf="users$ | async as users">
+  <li *ngFor="let user of users">
+    {{user.name}}
+  </li>
+</ul>
