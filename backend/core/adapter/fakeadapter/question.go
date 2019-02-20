@@ -31,7 +31,7 @@ func (d *QuestionDAO) CreateQuestion(q entity.Question, tags []entity.Tag) (enti
 		return entity.Question{}, err
 	}
 
-	q.ID = entity.ID(len(d.data.questions) + 1)
+	q.ID = entity.NewIDInt(len(d.data.questions) + 1)
 	d.data.questions = append(d.data.questions, q)
 	d.data.tags.UpdateQuestion(q.ID, tags)
 
@@ -39,7 +39,7 @@ func (d *QuestionDAO) CreateQuestion(q entity.Question, tags []entity.Tag) (enti
 }
 
 func (d *QuestionDAO) UpdateQuestion(p entity.QuestionUpdate) (entity.Question, error) {
-	if p.ID == 0 {
+	if p.ID.IsEmpty() {
 		return entity.Question{}, errors.New("ID can not be 0 nor absent")
 	}
 	for i, q := range d.data.questions {

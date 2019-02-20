@@ -2,6 +2,8 @@ package resolver
 
 import (
 	"goask/core/entity"
+
+	"github.com/graph-gophers/graphql-go"
 )
 
 // Question is the GraphQL resolver for Question type.
@@ -10,8 +12,8 @@ type Question struct {
 	entity entity.Question
 }
 
-func (q Question) ID() int32 {
-	return int32(q.entity.ID)
+func (q Question) ID() graphql.ID {
+	return graphql.ID(q.entity.ID)
 }
 
 func (q Question) Title() string {

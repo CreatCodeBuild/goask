@@ -30,7 +30,7 @@ func (d *UserDAO) Users() ([]entity.User, error) {
 }
 
 func (d *UserDAO) CreateUser(name string) (entity.User, error) {
-	user := entity.User{ID: entity.ID(len(d.data.users) + 1), Name: name}
+	user := entity.User{ID: entity.NewIDInt(len(d.data.users) + 1), Name: name}
 	d.data.users = append(d.data.users, user)
 	return user, d.data.serialize()
 }

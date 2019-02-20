@@ -2,14 +2,16 @@ package resolver
 
 import (
 	"goask/core/entity"
+
+	"github.com/graph-gophers/graphql-go"
 )
 
 type QuestionInput struct {
 	entity.QuestionUpdate
-	ID int32
+	ID graphql.ID
 }
 
 type AnswerCreationInput struct {
-	QuestionID int32
+	QuestionID graphql.ID
 	Content    string
 }

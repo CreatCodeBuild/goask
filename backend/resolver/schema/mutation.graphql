@@ -1,8 +1,8 @@
 type QuestionMutation {
     create(title: String!, content: String!, tags: [String!]): Question!
     update(id: ID!, title: String, content: String): Question!
-    delete(id: Int!): Question!
-    vote(id: Int!, type: VoteType!): Question!
+    delete(id: ID!): Question!
+    vote(id: ID!, type: VoteType!): Question!
 }
 
 enum VoteType {
@@ -11,9 +11,9 @@ enum VoteType {
 }
 
 type AnswerMutation {
-    create(questionID: Int!, content: String!): Answer!
-    accept(answerID: Int!): Answer!
-    delete(answerID: Int!): Answer!
+    create(questionID: ID!, content: String!): Answer!
+    accept(answerID: ID!): Answer!
+    delete(answerID: ID!): Answer!
 }
 
 type UserMutation {

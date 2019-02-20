@@ -2,6 +2,8 @@ package resolver
 
 import (
 	"goask/core/entity"
+
+	"github.com/graph-gophers/graphql-go"
 )
 
 type Root struct {
@@ -17,10 +19,10 @@ func NewQuery(stdResolver stdResolver) Query {
 	return Query{stdResolver: stdResolver}
 }
 
-func (q Query) Action(args struct{ UserID int32 }) QueryAction {
+func (q Query) Action(args struct{ UserID graphql.ID }) QueryAction {
 	return QueryAction{
 		stdResolver: q.stdResolver,
-		userSession: UserSession{UserID: entity.ID(args.UserID)},
+		userSession: UserSession{UserID: entity.NewIDString(string(args.UserID))},
 	}
 }
 

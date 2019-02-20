@@ -1,7 +1,7 @@
 package resolver
 
 import (
-	"goask/core/entity"
+	"github.com/graph-gophers/graphql-go"
 )
 
 type QueryAction struct {
@@ -14,14 +14,14 @@ func (q QueryAction) Questions(args struct{ Search *string }) ([]Question, error
 	return QuestionAll(questions, q.stdResolver), err
 }
 
-func (q QueryAction) Question(args struct{ ID int32 }) (*Question, error) {
-	question, err := q.QuestionDAO.QuestionByID(entity.ID(args.ID))
+func (q QueryAction) Question(args struct{ ID graphql.ID }) (*Question, error) {
+	question, err := q.QuestionDAO.QuestionByID(ToEntityID(args.ID))
 	questionResolver := QuestionOne(question, q.stdResolver)
 	return &questionResolver, err
 }
 
-func (q QueryAction) GetUser(args struct{ ID int32 }) (*User, error) {
-	user, err := q.UserDAO.UserByID(entity.ID(args.ID))
+func (q QueryAction) GetUser(args struct{ ID graphql.ID }) (*User, error) {
+	user, err := q.UserDAO.UserByID(ToEntityID(args.ID))
 	if err != nil {
 		return nil, err
 	}
