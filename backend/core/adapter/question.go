@@ -32,7 +32,7 @@ type ErrQuestionNotFound struct {
 }
 
 func (e *ErrQuestionNotFound) Error() string {
-	return fmt.Sprintf("question:%d not found", e.ID)
+	return fmt.Sprintf("question:%v not found", e.ID)
 }
 
 type ErrQuestionMutationDenied struct {
@@ -41,5 +41,5 @@ type ErrQuestionMutationDenied struct {
 }
 
 func (e *ErrQuestionMutationDenied) Error() string {
-	return fmt.Sprintf("user:%d is not authorized to delete question:%d", e.UserID, e.QuestionID)
+	return fmt.Sprintf("user:%v is not authorized to delete question:%v", e.UserID, e.QuestionID)
 }

@@ -18,7 +18,7 @@ type ErrQuestionOfAnswerNotFound struct {
 }
 
 func (e *ErrQuestionOfAnswerNotFound) Error() string {
-	return fmt.Sprintf("question:%d of answer:%d not found", e.QuestionID, e.AnswerID)
+	return fmt.Sprintf("question:%v of answer:%v not found", e.QuestionID, e.AnswerID)
 }
 
 // ErrAnswerNotFound
@@ -27,7 +27,7 @@ type ErrAnswerNotFound struct {
 }
 
 func (e *ErrAnswerNotFound) Error() string {
-	return fmt.Sprintf("answer:%d not found", e.ID)
+	return fmt.Sprintf("answer:%v not found", e.ID)
 }
 
 // ErrUserIsNotAuthorOfAnswer
@@ -37,5 +37,5 @@ type ErrUserIsNotAuthorOfAnswer struct {
 }
 
 func (e *ErrUserIsNotAuthorOfAnswer) Error() string {
-	return fmt.Sprintf("user:%d is not the author of answer:%d found", e.UserID, e.AnswerID)
+	return fmt.Sprintf("user:%v is not the author of answer:%v found", e.UserID, e.AnswerID)
 }

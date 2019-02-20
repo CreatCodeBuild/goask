@@ -4,11 +4,11 @@ schema {
 }
 
 type Query {
-    action(userID: Int!): QueryAction!
+    action(userID: ID!): QueryAction!
 }
 
 type Mutation {
-    questionMutation(userID: Int!): QuestionMutation!
-    answer(userID: Int!): AnswerMutation!
+    questionMutation(userID: ID!): QuestionMutation!
+    answer(userID: ID!): AnswerMutation!
     user: UserMutation!
 }

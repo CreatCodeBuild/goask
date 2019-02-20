@@ -2,10 +2,12 @@ package resolver
 
 import (
 	"goask/core/entity"
+
+	"github.com/graph-gophers/graphql-go"
 )
 
-func (m *Mutation) QuestionMutation(args struct{ UserID int32 }) (QuestionMutation, error) {
-	_, err := m.UserDAO.UserByID(entity.ID(args.UserID))
+func (m *Mutation) QuestionMutation(args struct{ UserID graphql.ID }) (QuestionMutation, error) {
+	_, err := m.UserDAO.UserByID(ToEntityID(args.UserID))
 	if err != nil {
 		return QuestionMutation{}, err
 	}
@@ -13,13 +15,13 @@ func (m *Mutation) QuestionMutation(args struct{ UserID int32 }) (QuestionMutati
 	return QuestionMutation{
 		stdResolver: m.stdResolver,
 		userSession: UserSession{
-			UserID: entity.ID(args.UserID),
+			UserID: ToEntityID(args.UserID),
 		},
 	}, nil
 }
 
-func (m *Mutation) Answer(args struct{ UserID int32 }) (AnswerMutation, error) {
-	_, err := m.UserDAO.UserByID(entity.ID(args.UserID))
+func (m *Mutation) Answer(args struct{ UserID graphql.ID }) (AnswerMutation, error) {
+	_, err := m.UserDAO.UserByID(ToEntityID(args.UserID))
 	if err != nil {
 		return AnswerMutation{}, err
 	}
@@ -27,7 +29,7 @@ func (m *Mutation) Answer(args struct{ UserID int32 }) (AnswerMutation, error) {
 	return AnswerMutation{
 		stdResolver: m.stdResolver,
 		userSession: UserSession{
-			UserID: entity.ID(args.UserID),
+			UserID: ToEntityID(args.UserID),
 		},
 	}, nil
 }
@@ -74,7 +76,7 @@ func (m QuestionMutation) Update(input QuestionInput) (Question, error) {
 		return Question{}, err
 	}
 
-	input.QuestionUpdate.ID = entity.ID(input.ID)
+	input.QuestionUpdate.ID = ToEntityID(input.ID)
 	q, err := m.QuestionDAO.UpdateQuestion(input.QuestionUpdate)
 	if err != nil {
 		m.log.Error(err)
@@ -82,29 +84,29 @@ func (m QuestionMutation) Update(input QuestionInput) (Question, error) {
 	return QuestionOne(q, m.stdResolver), err
 }
 
-func (m QuestionMutation) Delete(args struct{ ID int32 }) (Question, error) {
+func (m QuestionMutation) Delete(args struct{ ID graphql.ID }) (Question, error) {
 	if err := m.check(); err != nil {
 		return Question{}, err
 	}
 
-	question, err := m.QuestionDAO.DeleteQuestion(entity.ID(m.userSession.UserID), entity.ID(args.ID))
+	question, err := m.QuestionDAO.DeleteQuestion(m.userSession.UserID, ToEntityID(args.ID))
 	return QuestionOne(question, m.stdResolver), err
 }
 
 func (m QuestionMutation) Vote(args struct {
-	ID   int32
+	ID   graphql.ID
 	Type string
 }) (Question, error) {
 	if err := m.check(); err != nil {
 		return Question{}, err
 	}
 
-	_, err := m.QuestionDAO.VoteQuestion(m.userSession.UserID, entity.ID(args.ID), entity.VoteType(args.Type))
+	_, err := m.QuestionDAO.VoteQuestion(m.userSession.UserID, ToEntityID(args.ID), entity.VoteType(args.Type))
 	if err != nil {
 		return Question{}, err
 	}
 
-	question, err := m.QuestionDAO.QuestionByID(entity.ID(args.ID))
+	question, err := m.QuestionDAO.QuestionByID(ToEntityID(args.ID))
 	return QuestionOne(question, m.stdResolver), err
 }
 
@@ -118,28 +120,28 @@ func (m AnswerMutation) Create(args AnswerCreationInput) (Answer, error) {
 		return Answer{}, err
 	}
 
-	answer, err := m.AnswerDAO.CreateAnswer(entity.ID(args.QuestionID), args.Content, m.userSession.UserID)
+	answer, err := m.AnswerDAO.CreateAnswer(ToEntityID(args.QuestionID), args.Content, m.userSession.UserID)
 	if err != nil {
 		m.log.Error(err)
 	}
 	return AnswerOne(answer, m.stdResolver), err
 }
 
-func (m AnswerMutation) Accept(args struct{ AnswerID int32 }) (Answer, error) {
+func (m AnswerMutation) Accept(args struct{ AnswerID graphql.ID }) (Answer, error) {
 	if err := m.check(); err != nil {
 		return Answer{}, err
 	}
 
-	an, err := m.AnswerDAO.AcceptAnswer(entity.ID(args.AnswerID), m.userSession.UserID)
+	an, err := m.AnswerDAO.AcceptAnswer(ToEntityID(args.AnswerID), m.userSession.UserID)
 	return AnswerOne(an, m.stdResolver), err
 }
 
-func (m AnswerMutation) Delete(args struct{ AnswerID int32 }) (Answer, error) {
+func (m AnswerMutation) Delete(args struct{ AnswerID graphql.ID }) (Answer, error) {
 	if err := m.check(); err != nil {
 		return Answer{}, err
 	}
 
-	an, err := m.AnswerDAO.DeleteAnswer(entity.ID(args.AnswerID), m.userSession.UserID)
+	an, err := m.AnswerDAO.DeleteAnswer(ToEntityID(args.AnswerID), m.userSession.UserID)
 	return AnswerOne(an, m.stdResolver), err
 }
 

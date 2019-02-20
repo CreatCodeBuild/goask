@@ -2,6 +2,8 @@ package resolver
 
 import (
 	"goask/core/entity"
+
+	"github.com/graph-gophers/graphql-go"
 )
 
 type VoteCount struct {
@@ -23,8 +25,8 @@ type Answer struct {
 	entity entity.Answer
 }
 
-func (a Answer) ID() int32 {
-	return int32(a.entity.ID)
+func (a Answer) ID() graphql.ID {
+	return graphql.ID(a.entity.ID)
 }
 
 func (a Answer) Content() string {
@@ -77,8 +79,8 @@ type User struct {
 	entity entity.User
 }
 
-func (u User) ID() int32 {
-	return int32(u.entity.ID)
+func (u User) ID() graphql.ID {
+	return graphql.ID(u.entity.ID)
 }
 
 func (u User) Name() string {
@@ -100,4 +102,8 @@ func UserAll(users []entity.User, data stdResolver) []User {
 		ret[i] = UserOne(user, data)
 	}
 	return ret
+}
+
+func ToEntityID(id graphql.ID) entity.ID {
+	return entity.NewIDString(string(id))
 }

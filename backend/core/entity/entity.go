@@ -1,5 +1,9 @@
 package entity
 
+import (
+	"strconv"
+)
+
 type Answer struct {
 	ID         ID
 	QuestionID ID
@@ -13,8 +17,24 @@ type User struct {
 	Name string
 }
 
-type ID int64
+type ID string
 
-func (id ID) Equal(i int32) bool {
+func NewIDInt(id int) ID {
+	return ID(strconv.FormatInt(int64(id), 10))
+}
+
+func NewIDString(id string) ID {
+	return ID(id)
+}
+
+func (id ID) EqualInt(i int32) bool {
 	return id == ID(i)
+}
+
+func (id ID) IsEmpty() bool {
+	return len(id) == 0
+}
+
+func (id ID) String() string {
+	return string(id)
 }

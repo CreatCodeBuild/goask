@@ -19,7 +19,7 @@ type ErrUserNotFound struct {
 }
 
 func (e *ErrUserNotFound) Error() string {
-	return fmt.Sprintf("user:%d not found", e.ID)
+	return fmt.Sprintf("user:%v not found", e.ID)
 }
 
 type ErrUserIsNotAuthorOfQuestion struct {
@@ -28,5 +28,5 @@ type ErrUserIsNotAuthorOfQuestion struct {
 }
 
 func (e *ErrUserIsNotAuthorOfQuestion) Error() string {
-	return fmt.Sprintf("user:%d is no the author of question:%d", e.UserID, e.QuestionID)
+	return fmt.Sprintf("user:%v is no the author of question:%v", e.UserID, e.QuestionID)
 }
