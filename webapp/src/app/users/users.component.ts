@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GraphqlService } from '../graphql.service';
 import {map, filter} from 'rxjs/operators';
-import { Observable } from 'apollo-link';
 
 @Component({
   selector: 'app-users',
