@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 export class QuestionDetailComponent implements OnInit {
 
   private question: Question;
+  private questionID: string;
 
   constructor(
     private graphqlService: GraphqlService,
@@ -19,10 +20,13 @@ export class QuestionDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-    let self = this;
-    this.graphqlService.queryQuestionDetail("1").subscribe(function next(result) {
-      console.log(result)
-      self.question = result.data.action.question
+    this.route.paramMap.subscribe((paramMap)=>{
+      this.questionID = paramMap.get("id")
+      // console.log(this.questionID)
+      this.graphqlService.queryQuestionDetail(this.questionID).subscribe((result) => {
+        // console.log(result)
+        this.question = result.data.action.question
+      })
     })
   }
 
