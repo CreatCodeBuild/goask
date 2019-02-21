@@ -65,6 +65,33 @@ export class GraphqlService {
     });
   }
 
+  queryUser(actionTakerID: string, userID: string) {
+    const queryUsers = gql`
+      query ($actionTakerID: ID!, $userID: ID!) {
+        action(userID: $actionTakerID) {
+          user(id: $userID) {
+            id
+            name
+            questions {
+              id
+              answers {
+                id
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    return this.apollo.query<any>({
+      query: queryUsers,
+      variables: {
+        "actionTakerID": actionTakerID,
+        "userID": userID,
+      }
+    });
+  }
+
   queryUsers() {
     const queryUsers = gql`
       query GetAllUserQuery{
