@@ -1,0 +1,10 @@
+<p>
+  Questions
+</p>
+<ul>
+  <li *ngFor="let q of questions">
+    <div>{{ q.title }}</div>
+    <div>{{ q.content }}</div>
+    <button routerLink="/question/{{q.id}}">Detail</button>
+  </li>
+</ul>

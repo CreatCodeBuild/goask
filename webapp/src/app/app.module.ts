@@ -7,14 +7,24 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { AppComponent } from './app.component';
 import { environment } from 'src/environments/environment';
 import { UsersComponent } from './users/users.component';
-import { UserComponent } from './user/user.component';
 import { Routes, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { QuestionsComponent } from './questions/questions.component';
+import { QuestionDetailComponent } from './question-detail/question-detail.component';
+import { NavComponent } from './nav/nav.component';
 
 const routes: Routes = [
   {
     path: 'users',
     component: UsersComponent
+  },
+  {
+    path: 'question/:id',
+    component: QuestionDetailComponent,
+  },
+  {
+    path: 'questions',
+    component: QuestionsComponent,
   }
 ];
 
@@ -22,7 +32,9 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     UsersComponent,
-    UserComponent
+    QuestionsComponent,
+    QuestionDetailComponent,
+    NavComponent
   ],
   imports: [
     BrowserModule,
