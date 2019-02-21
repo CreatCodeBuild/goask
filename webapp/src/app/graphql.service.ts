@@ -100,7 +100,7 @@ interface  Author {
   name: string
 }
 
-interface Answer {
+export interface Answer {
   id: string
   content: string
   author: Author

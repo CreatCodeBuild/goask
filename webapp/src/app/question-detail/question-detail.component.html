@@ -5,6 +5,6 @@
   <div>Author: {{ question.author.name }} </div>
 
   <li *ngFor="let a of question.answers">
-    <ul><app-answer-detail></app-answer-detail></ul>
+    <ul><app-answer-detail [answer]="a"></app-answer-detail></ul>
   </li>
 </div>
