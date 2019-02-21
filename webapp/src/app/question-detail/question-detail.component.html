@@ -1,6 +1,10 @@
 <div *ngIf="question">
   <div>ID: {{ question.id }}</div>
   <div>Title: {{ question.title }}</div>
-  <div>Content: </div>{{ question.content }}
+  <div>Content: {{ question.content }}</div>
   <div>Author: {{ question.author.name }} </div>
+
+  <li *ngFor="let a of question.answers">
+    <ul><app-answer-detail></app-answer-detail></ul>
+  </li>
 </div>

@@ -41,6 +41,14 @@ export class GraphqlService {
               id
               name
             }
+            answers {
+              id
+              content
+              author {
+                id
+                name
+              }
+            }
           }
         }
       }
@@ -81,12 +89,19 @@ interface Action {
 }
 
 export interface  Question {
-  id: Number
+  id: string
   title: string
   content: string
   author: Author
+  answers: Answer[]
 }
 
 interface  Author {
   name: string
+}
+
+interface Answer {
+  id: string
+  content: string
+  author: Author
 }

@@ -12,6 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { QuestionsComponent } from './questions/questions.component';
 import { QuestionDetailComponent } from './question-detail/question-detail.component';
 import { NavComponent } from './nav/nav.component';
+import { AnswerDetailComponent } from './answer-detail/answer-detail.component';
 
 const routes: Routes = [
   {
@@ -34,7 +35,8 @@ const routes: Routes = [
     UsersComponent,
     QuestionsComponent,
     QuestionDetailComponent,
-    NavComponent
+    NavComponent,
+    AnswerDetailComponent
   ],
   imports: [
     BrowserModule,
