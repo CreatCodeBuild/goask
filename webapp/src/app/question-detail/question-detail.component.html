@@ -1,6 +1,6 @@
-<p *ngIf="question">
-  {{ question.id }}
-  {{ question.title }}
-  {{ question.content }}
-  {{ question.author.name }}
-</p>
+<div *ngIf="question">
+  <div>ID: {{ question.id }}</div>
+  <div>Title: {{ question.title }}</div>
+  <div>Content: </div>{{ question.content }}
+  <div>Author: {{ question.author.name }} </div>
+</div>
