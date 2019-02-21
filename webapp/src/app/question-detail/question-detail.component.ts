@@ -20,14 +20,11 @@ export class QuestionDetailComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.paramMap.subscribe((paramMap)=>{
+    this.route.paramMap.subscribe(async (paramMap) => {
       this.questionID = paramMap.get("id")
-      // console.log(this.questionID)
-      this.graphqlService.queryQuestionDetail(this.questionID).subscribe((result) => {
-        // console.log(result)
-        this.question = result.data.action.question
-      })
-    })
+      let result = await this.graphqlService.queryQuestionDetail(this.questionID).toPromise()
+      this.question = result.data.action.question
+    })  
   }
 
 }

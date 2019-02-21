@@ -11,6 +11,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { QuestionsComponent } from './questions/questions.component';
 import { QuestionDetailComponent } from './question-detail/question-detail.component';
+import { NavComponent } from './nav/nav.component';
 
 const routes: Routes = [
   {
@@ -20,6 +21,10 @@ const routes: Routes = [
   {
     path: 'question/:id',
     component: QuestionDetailComponent,
+  },
+  {
+    path: 'questions',
+    component: QuestionsComponent,
   }
 ];
 
@@ -28,7 +33,8 @@ const routes: Routes = [
     AppComponent,
     UsersComponent,
     QuestionsComponent,
-    QuestionDetailComponent
+    QuestionDetailComponent,
+    NavComponent
   ],
   imports: [
     BrowserModule,
