@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GraphqlService, Question } from '../graphql.service';
 import { ActivatedRoute } from '@angular/router';
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-question-detail',
@@ -13,6 +14,7 @@ export class QuestionDetailComponent implements OnInit {
 
   constructor(
     private graphqlService: GraphqlService,
+    private userService: UserService,
     private route: ActivatedRoute // todo? how to use it?
   ) { 
 
@@ -21,7 +23,8 @@ export class QuestionDetailComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe(async (paramMap) => {
       let questionID = paramMap.get("id")
-      let result = await this.graphqlService.queryQuestionDetail(questionID).toPromise()
+      let userID = this.userService.current().id
+      let result = await this.graphqlService.queryQuestionDetail(userID, questionID).toPromise()
       this.question = result.data.action.question
     })  
   }

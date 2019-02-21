@@ -11,10 +11,10 @@ export class GraphqlService {
     private apollo: Apollo
   ) { }
 
-  queryQuestions() {
+  queryQuestions(userID: string) {
     const QueryQuestions = gql`
-      query {
-        action(userID: "1") {
+      query ($userID: ID!) {
+        action(userID: $userID) {
           questions {
             id
             title
@@ -24,15 +24,18 @@ export class GraphqlService {
       }
     `;
     let obs = this.apollo.query<Data>({
-      query: QueryQuestions
+      query: QueryQuestions,
+      variables: {
+        "userID": userID,
+      }
     });
     return obs
   }
 
-  queryQuestionDetail(questionID: string) {
+  queryQuestionDetail(userID: string, questionID: string) {
     const QueryQuestions = gql`
-      query ($questionID: ID!) {
-        action(userID: "1") {
+      query ($userID: ID!, $questionID: ID!) {
+        action(userID: $userID) {
           question(id: $questionID) {
             id
             title
@@ -57,6 +60,7 @@ export class GraphqlService {
       query: QueryQuestions,
       variables: {
         "questionID": questionID,
+        "userID": userID,
       }
     });
   }
