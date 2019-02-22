@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Query } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
@@ -74,6 +74,7 @@ export class GraphqlService {
             name
             questions {
               id
+              content
               answers {
                 id
               }
@@ -123,16 +124,18 @@ export interface  Question {
   id: string
   title: string
   content: string
-  author: Author
+  author: User
   answers: Answer[]
 }
 
-interface  Author {
+export interface User {
+  id: string
   name: string
+  questions: Question[]
 }
 
 export interface Answer {
   id: string
   content: string
-  author: Author
+  author: User
 }

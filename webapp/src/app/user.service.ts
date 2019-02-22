@@ -9,7 +9,7 @@ export class UserService {
 
   current(): User {
     return {
-      id: "", // empty string represents an unlogged in user
+      id: "1", // empty string represents an unlogged in user
       name: "游客"
     }
   }

@@ -13,6 +13,7 @@ import { QuestionsComponent } from './questions/questions.component';
 import { QuestionDetailComponent } from './question-detail/question-detail.component';
 import { NavComponent } from './nav/nav.component';
 import { AnswerDetailComponent } from './answer-detail/answer-detail.component';
+import { UserDetailComponent } from './user-detail/user-detail.component';
 
 const routes: Routes = [
   {
@@ -26,6 +27,10 @@ const routes: Routes = [
   {
     path: 'questions',
     component: QuestionsComponent,
+  },
+  {
+    path: 'me',
+    component: UserDetailComponent,
   }
 ];
 
@@ -36,7 +41,8 @@ const routes: Routes = [
     QuestionsComponent,
     QuestionDetailComponent,
     NavComponent,
-    AnswerDetailComponent
+    AnswerDetailComponent,
+    UserDetailComponent
   ],
   imports: [
     BrowserModule,
