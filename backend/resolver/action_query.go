@@ -20,7 +20,7 @@ func (q QueryAction) Question(args struct{ ID graphql.ID }) (*Question, error) {
 	return &questionResolver, err
 }
 
-func (q QueryAction) GetUser(args struct{ ID graphql.ID }) (*User, error) {
+func (q QueryAction) User(args struct{ ID graphql.ID }) (*User, error) {
 	user, err := q.UserDAO.UserByID(ToEntityID(args.ID))
 	if err != nil {
 		return nil, err
