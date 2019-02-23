@@ -14,6 +14,7 @@ import { QuestionDetailComponent } from './question-detail/question-detail.compo
 import { NavComponent } from './nav/nav.component';
 import { AnswerDetailComponent } from './answer-detail/answer-detail.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
+import { UserSummaryComponent } from './user-summary/user-summary.component';
 
 const routes: Routes = [
   {
@@ -42,7 +43,8 @@ const routes: Routes = [
     QuestionDetailComponent,
     NavComponent,
     AnswerDetailComponent,
-    UserDetailComponent
+    UserDetailComponent,
+    UserSummaryComponent
   ],
   imports: [
     BrowserModule,
