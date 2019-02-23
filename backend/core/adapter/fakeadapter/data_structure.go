@@ -147,6 +147,16 @@ func (u *Users) Get(userID entity.ID) (entity.User, bool) {
 
 type Questions []entity.Question
 
+func (a *Questions) Filter(f func(entity.Question) bool) Questions {
+	var ret Questions
+	for _, an := range *a {
+		if f(an) {
+			ret = append(ret, an)
+		}
+	}
+	return ret
+}
+
 func (q *Questions) Get(questionID entity.ID) (entity.Question, bool) {
 	for _, qu := range *q {
 		if qu.ID == questionID {
