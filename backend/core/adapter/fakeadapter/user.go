@@ -35,6 +35,13 @@ func (d *UserDAO) CreateUser(name string) (entity.User, error) {
 	return user, d.data.serialize()
 }
 
+func (d *UserDAO) QuestionCount(ID entity.ID) (int, error) {
+	qs := d.data.questions.Filter(func(q entity.Question) bool {
+		return q.AuthorID == ID
+	})
+	return len(qs), nil
+}
+
 func (d *UserDAO) QuestionsOfUser(ID entity.ID) ([]entity.Question, error) {
 	var ret []entity.Question
 	for _, q := range d.data.questions {

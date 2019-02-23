@@ -72,13 +72,7 @@ export class GraphqlService {
           user(id: $userID) {
             id
             name
-            questions {
-              id
-              content
-              answers {
-                id
-              }
-            }
+            questionCount
           }
         }
       }
@@ -131,6 +125,7 @@ export interface  Question {
 export interface User {
   id: string
   name: string
+  questionCount: number
   questions: Question[]
 }
 

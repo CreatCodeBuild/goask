@@ -11,6 +11,7 @@ type UserDAO interface {
 	Users() ([]entity.User, error)
 	CreateUser(name string) (entity.User, error)
 	// Associated Questions
+	QuestionCount(UserID entity.ID) (int, error)
 	QuestionsOfUser(UserID entity.ID) ([]entity.Question, error)
 }
 

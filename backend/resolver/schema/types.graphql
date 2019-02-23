@@ -35,5 +35,6 @@ type Answer implements Post {
 type User {
     id: ID!
     name: String!
+    questionCount: Int!
     questions: [Question!]!
 }

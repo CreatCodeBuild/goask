@@ -12,7 +12,7 @@ import (
 
 func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.AnswerDAO, userDAO adapter.UserDAO, tagDAO adapter.TagDAO) {
 
-	t.Run("create questions", func(t *testing.T) {
+	t.Run("create questions", func(t2 *testing.T) {
 		_, err := questionDAO.CreateQuestion(entity.Question{AuthorID: "x"}, nil)
 		require.EqualError(t, err, "user:x not found")
 
@@ -25,7 +25,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		require.NoError(t, err)
 		require.Equal(t, entity.Question{AuthorID: "1", ID: "1"}, question)
 
-		t.Run("create question with tag", func(t *testing.T) {
+		t.Run("create question with tag", func(t2 *testing.T) {
 			q, err := questionDAO.CreateQuestion(entity.Question{AuthorID: "1"}, []entity.Tag{"Go1", "Go2"})
 			require.NoError(t, err)
 
@@ -35,12 +35,12 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		})
 	})
 
-	t.Run("create answers", func(t *testing.T) {
+	t.Run("create answers", func(t2 *testing.T) {
 		answer, err := answerDAO.CreateAnswer("1", "answer 1", "1")
 		require.NoError(t, err)
 		require.Equal(t, entity.Answer{ID: "1", QuestionID: "1", AuthorID: "1", Content: "answer 1"}, answer)
 
-		t.Run("accept answers", func(t *testing.T) {
+		t.Run("accept answers", func(t2 *testing.T) {
 			acceptedAnswer, err := answerDAO.AcceptAnswer(answer.ID, answer.AuthorID)
 			require.NoError(t, err)
 			require.Equal(t,
@@ -50,7 +50,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 			_, err = answerDAO.AcceptAnswer(answer.ID, "-1")
 			require.EqualError(t, err, "user:-1 is no the author of question:1")
 
-			t.Run("delete answers", func(t *testing.T) {
+			t.Run("delete answers", func(t2 *testing.T) {
 				deletedAnswer, err := answerDAO.DeleteAnswer(answer.ID, answer.AuthorID)
 				require.NoError(t, err)
 				require.Equal(t, deletedAnswer, acceptedAnswer)
@@ -58,7 +58,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		})
 	})
 
-	t.Run("delete questions", func(t *testing.T) {
+	t.Run("delete questions", func(t2 *testing.T) {
 		_, err := questionDAO.DeleteQuestion("2", "1")
 		require.EqualError(t, err, "user:2 not found")
 
@@ -80,7 +80,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		require.Empty(t, answers)
 	})
 
-	t.Run("vote a question", func(t *testing.T) {
+	t.Run("vote a question", func(t2 *testing.T) {
 		user, err := userDAO.CreateUser("user 2")
 		require.NoError(t, err)
 
@@ -104,7 +104,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		require.Equal(t, question.ID, vote.QuestionID)
 		require.Equal(t, entity.UpVote(), vote.Type)
 
-		t.Run("The same use replace a vote with the opposite type for the same question", func(t *testing.T) {
+		t.Run("The same use replace a vote with the opposite type for the same question", func(t2 *testing.T) {
 			vote2, err := questionDAO.VoteQuestion(user.ID, question.ID, entity.DownVote())
 			require.NoError(t, err)
 			require.Equal(t, user.ID, vote2.UserID)
@@ -117,7 +117,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 			require.Equal(t, 1, down)
 		})
 
-		t.Run("The same user can't vote the same for the same question", func(t *testing.T) {
+		t.Run("The same user can't vote the same for the same question", func(t2 *testing.T) {
 			_, err := questionDAO.VoteQuestion(user.ID, question.ID, entity.DownVote())
 			require.Equal(t,
 				fmt.Sprintf("user:%v has voted DOWN for question:%v", user.ID, question.ID),
@@ -125,7 +125,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		})
 	})
 
-	t.Run("tag questions", func(t *testing.T) {
+	t.Run("tag questions", func(t2 *testing.T) {
 		user, err := userDAO.CreateUser("tagger")
 		require.NoError(t, err)
 
@@ -169,4 +169,24 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		require.NoError(t, err)
 		require.Empty(t, questions)
 	})
+
+	t.Run("user question count", func(t2 *testing.T) {
+		u := setupOneUserAndThreeQuestions(t, questionDAO, userDAO)
+		count, err := userDAO.QuestionCount(u.ID)
+		require.NoError(t, err)
+		require.Equal(t, 3, count)
+	})
+}
+
+func setupOneUserAndThreeQuestions(t *testing.T, qDAO adapter.QuestionDAO, uDAO adapter.UserDAO) entity.User {
+	u, err := uDAO.CreateUser("Test User")
+	require.NoError(t, err)
+
+	for i := 0; i < 3; i++ {
+		_, err = qDAO.CreateQuestion(entity.Question{
+			AuthorID: u.ID,
+		}, nil)
+		require.NoError(t, err)
+	}
+	return u
 }
