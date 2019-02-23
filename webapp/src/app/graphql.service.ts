@@ -94,6 +94,7 @@ export class GraphqlService {
           users {
             id
             name
+            questionCount
           }
         }
       }
