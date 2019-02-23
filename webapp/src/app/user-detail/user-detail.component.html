@@ -1,12 +1,6 @@
-<div *ngIf="user">
-  user-detail works!
-  <div>ID: {{user.id}}</div>
-  <div>Name: {{user.name}}</div>
-  <div>
-    Questions
-    <div *ngFor="let q of user.questions">
-      <div>ID: {{q.id}}</div>
-      <div>Content: {{q.content}}</div>
-    </div>
+<div id="this" class="card" style="width: 18rem;" *ngIf="user">
+  <div class="card-body">
+    <h5 class="card-title">用户名: {{user.name}}</h5>
+    <p>提问数: {{user.questionCount}}</p>
   </div>
 </div>
