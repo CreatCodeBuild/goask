@@ -1,0 +1,17 @@
+<form id="this" #form="ngForm" (ngSubmit)="submit(form)">
+  <div class="form-group">
+    <input
+      ngModel
+      name="userName"
+      class="form-control"  
+      placeholder="User Name"
+    >
+    <input
+      ngModel
+      name="userID"
+      class="form-control"  
+      placeholder="User ID"
+    >
+  </div>
+  <button class="btn btn-primary">Submit</button>
+</form>

@@ -4,14 +4,21 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class UserService {
+  private user: User
 
-  constructor() { }
-
-  current(): User {
-    return {
-      id: "1", // empty string represents an unlogged in user
+  constructor() {
+    this.user = {
+      id: "", // empty string represents an unlogged in user
       name: "游客"
     }
+  }
+
+  set User(user: User) {
+    this.user = user
+  }
+
+  current(): User {
+    return this.user
   }
 }
 
