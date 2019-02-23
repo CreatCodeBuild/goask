@@ -1,6 +1,7 @@
 type QueryAction {
     questions(search: String): [Question!]!
     question(id: ID!): Question
+    signIn(id: ID!, name: String!): User
     user(id: ID!): User
     users: [User!]!
 }

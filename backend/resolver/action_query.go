@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"github.com/graph-gophers/graphql-go"
+	"github.com/pkg/errors"
 )
 
 type QueryAction struct {
@@ -18,6 +19,21 @@ func (q QueryAction) Question(args struct{ ID graphql.ID }) (*Question, error) {
 	question, err := q.QuestionDAO.QuestionByID(ToEntityID(args.ID))
 	questionResolver := QuestionOne(question, q.stdResolver)
 	return &questionResolver, err
+}
+
+func (q QueryAction) SignIn(args struct {
+	ID   graphql.ID
+	Name string
+}) (*User, error) {
+	user, err := q.UserDAO.UserByID(ToEntityID(args.ID))
+	if err != nil {
+		return nil, err
+	}
+	if user.Name != args.Name {
+		return nil, errors.New("User name is wrong for this ID")
+	}
+	userResolver := UserOne(user, q.stdResolver)
+	return &userResolver, q.check()
 }
 
 func (q QueryAction) User(args struct{ ID graphql.ID }) (*User, error) {
