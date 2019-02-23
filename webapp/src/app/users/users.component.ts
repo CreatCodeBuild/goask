@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GraphqlService } from '../graphql.service';
-import {map, filter} from 'rxjs/operators';
+import { GraphqlService, User } from '../graphql.service';
 
 @Component({
   selector: 'app-users',
@@ -8,7 +7,7 @@ import {map, filter} from 'rxjs/operators';
   styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit {
-  users$: any;
+  users: User[];
 
   constructor(
     private userService: GraphqlService
@@ -16,11 +15,9 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.users$ = this.userService.queryUsers()
-    .pipe(
-      filter(res => res.loading === false),
-      map(res => res.data.action.users)
-    );
+    this.userService.queryUsers().subscribe((next)=>{
+      this.users = next.data.action.users
+    })
   }
 
 }

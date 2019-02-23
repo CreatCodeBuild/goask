@@ -9,11 +9,5 @@ export class NavComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-  }
-
-  users() {
-    console.log("users")
-  }
-
+  ngOnInit() {}
 }

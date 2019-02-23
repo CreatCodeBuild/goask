@@ -1,6 +1,13 @@
-<p *ngIf="question">
-  {{ question.id }}
-  {{ question.title }}
-  {{ question.content }}
-  {{ question.author.name }}
-</p>
+<div *ngIf="question">
+  <div id="goask-question" class="card" style="width: 18rem;">
+    <div lass="card-body">
+      <h5 class="card-title">{{ question.title }}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">By: {{ question.author.name }}</h6>
+      <p class="card-text">{{ question.content }}</p>
+    </div>
+  </div>
+
+  <div *ngFor="let a of question.answers">
+      <app-answer-detail [answer]="a"></app-answer-detail>
+  </div>
+</div>

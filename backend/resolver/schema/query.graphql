@@ -1,6 +1,6 @@
 type QueryAction {
     questions(search: String): [Question!]!
     question(id: ID!): Question
-    getUser(id: ID!): User
+    user(id: ID!): User
     users: [User!]!
 }

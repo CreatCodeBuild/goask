@@ -1,0 +1,12 @@
+<div *ngIf="user">
+  user-detail works!
+  <div>ID: {{user.id}}</div>
+  <div>Name: {{user.name}}</div>
+  <div>
+    Questions
+    <div *ngFor="let q of user.questions">
+      <div>ID: {{q.id}}</div>
+      <div>Content: {{q.content}}</div>
+    </div>
+  </div>
+</div>

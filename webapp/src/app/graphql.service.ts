@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Query } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
@@ -11,10 +11,10 @@ export class GraphqlService {
     private apollo: Apollo
   ) { }
 
-  queryQuestions() {
+  queryQuestions(userID: string) {
     const QueryQuestions = gql`
-      query {
-        action(userID: "1") {
+      query ($userID: ID!) {
+        action(userID: $userID) {
           questions {
             id
             title
@@ -24,15 +24,18 @@ export class GraphqlService {
       }
     `;
     let obs = this.apollo.query<Data>({
-      query: QueryQuestions
+      query: QueryQuestions,
+      variables: {
+        "userID": userID,
+      }
     });
     return obs
   }
 
-  queryQuestionDetail(questionID: string) {
+  queryQuestionDetail(userID: string, questionID: string) {
     const QueryQuestions = gql`
-      query ($questionID: ID!) {
-        action(userID: "1") {
+      query ($userID: ID!, $questionID: ID!) {
+        action(userID: $userID) {
           question(id: $questionID) {
             id
             title
@@ -40,6 +43,14 @@ export class GraphqlService {
             author {
               id
               name
+            }
+            answers {
+              id
+              content
+              author {
+                id
+                name
+              }
             }
           }
         }
@@ -49,6 +60,35 @@ export class GraphqlService {
       query: QueryQuestions,
       variables: {
         "questionID": questionID,
+        "userID": userID,
+      }
+    });
+  }
+
+  queryUser(actionTakerID: string, userID: string) {
+    const queryUsers = gql`
+      query ($actionTakerID: ID!, $userID: ID!) {
+        action(userID: $actionTakerID) {
+          user(id: $userID) {
+            id
+            name
+            questions {
+              id
+              content
+              answers {
+                id
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    return this.apollo.query<any>({
+      query: queryUsers,
+      variables: {
+        "actionTakerID": actionTakerID,
+        "userID": userID,
       }
     });
   }
@@ -81,12 +121,21 @@ interface Action {
 }
 
 export interface  Question {
-  id: Number
+  id: string
   title: string
   content: string
-  author: Author
+  author: User
+  answers: Answer[]
 }
 
-interface  Author {
+export interface User {
+  id: string
   name: string
+  questions: Question[]
+}
+
+export interface Answer {
+  id: string
+  content: string
+  author: User
 }
