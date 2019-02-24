@@ -95,6 +95,7 @@ export class GraphqlService {
             id
             name
             questionCount
+            answerCount
           }
         }
       }
@@ -117,6 +118,7 @@ export class GraphqlService {
             id
             name
             questionCount
+            answerCount
           }
         }
       }
@@ -150,6 +152,7 @@ export interface User {
   name: string
   questionCount: number
   questions: Question[]
+  answerCount: number
 }
 
 export interface Answer {
