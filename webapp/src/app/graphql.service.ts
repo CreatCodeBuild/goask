@@ -65,6 +65,28 @@ export class GraphqlService {
     });
   }
 
+  querySignIn(actionTakerID: string, userID: string, userName: string) {
+    const query = gql`
+      query ($actionTakerID: ID!, $userID: ID!, $userName: String!) {
+        action(userID: $actionTakerID) {
+          signIn(id: $userID, name: $userName) {
+            id
+            name
+          }
+        }
+      }
+    `;
+
+    return this.apollo.query<any>({
+      query: query,
+      variables: {
+        "actionTakerID": actionTakerID,
+        "userID": userID,
+        "userName": userName,
+      }
+    });
+  }
+
   queryUser(actionTakerID: string, userID: string) {
     const queryUsers = gql`
       query ($actionTakerID: ID!, $userID: ID!) {

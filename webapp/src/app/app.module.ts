@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule }   from '@angular/forms';
 import { ApolloModule, APOLLO_OPTIONS } from 'apollo-angular';
 import { HttpLinkModule, HttpLink } from 'apollo-angular-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -15,6 +16,9 @@ import { NavComponent } from './nav/nav.component';
 import { AnswerDetailComponent } from './answer-detail/answer-detail.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserSummaryComponent } from './user-summary/user-summary.component';
+import { SigninComponent } from './signin/signin.component';
+import { SignupComponent } from './signup/signup.component';
+import { UserMeComponent } from './user-me/user-me.component';
 
 const routes: Routes = [
   {
@@ -31,7 +35,15 @@ const routes: Routes = [
   },
   {
     path: 'me',
-    component: UserDetailComponent,
+    component: UserMeComponent,
+  },
+  {
+    path: 'signin',
+    component: SigninComponent,
+  },
+  {
+    path: 'signup',
+    component: SignupComponent,
   }
 ];
 
@@ -44,14 +56,18 @@ const routes: Routes = [
     NavComponent,
     AnswerDetailComponent,
     UserDetailComponent,
-    UserSummaryComponent
+    UserSummaryComponent,
+    SigninComponent,
+    SignupComponent,
+    UserMeComponent
   ],
   imports: [
     BrowserModule,
     ApolloModule,
     HttpClientModule,
     HttpLinkModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    FormsModule,
   ],
   providers: [
     {

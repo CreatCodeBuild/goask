@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { GraphqlService, User } from '../graphql.service';
 import { UserService } from '../user.service';
 
@@ -11,13 +11,16 @@ export class UserDetailComponent implements OnInit {
 
   private user: User
 
+  @Input() private userID: string
+
   constructor(
     private graphqlService: GraphqlService,
     private userService: UserService
   ) { }
 
   ngOnInit() {
-    let obs = this.graphqlService.queryUser(this.userService.current().id, this.userService.current().id)
+    console.log(this.userService.current().id, this.userID)
+    let obs = this.graphqlService.queryUser(this.userService.current().id, this.userID)
     obs.subscribe(
       (value) => {
         console.log(value)
