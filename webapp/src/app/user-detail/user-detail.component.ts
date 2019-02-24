@@ -19,6 +19,7 @@ export class UserDetailComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    console.log(this.userService.current().id, this.userID)
     let obs = this.graphqlService.queryUser(this.userService.current().id, this.userID)
     obs.subscribe(
       (value) => {

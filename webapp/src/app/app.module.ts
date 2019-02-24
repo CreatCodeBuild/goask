@@ -18,6 +18,7 @@ import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserSummaryComponent } from './user-summary/user-summary.component';
 import { SigninComponent } from './signin/signin.component';
 import { SignupComponent } from './signup/signup.component';
+import { UserMeComponent } from './user-me/user-me.component';
 
 const routes: Routes = [
   {
@@ -34,7 +35,7 @@ const routes: Routes = [
   },
   {
     path: 'me',
-    component: UserDetailComponent,
+    component: UserMeComponent,
   },
   {
     path: 'signin',
@@ -57,7 +58,8 @@ const routes: Routes = [
     UserDetailComponent,
     UserSummaryComponent,
     SigninComponent,
-    SignupComponent
+    SignupComponent,
+    UserMeComponent
   ],
   imports: [
     BrowserModule,
