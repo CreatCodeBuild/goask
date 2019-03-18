@@ -13,6 +13,8 @@ type UserDAO interface {
 	// Associated Questions
 	QuestionCount(UserID entity.ID) (int, error)
 	QuestionsOfUser(UserID entity.ID) ([]entity.Question, error)
+	// Associated Answers
+	AnswerCount(UserID entity.ID) (int, error)
 }
 
 type ErrUserNotFound struct {
@@ -20,7 +22,7 @@ type ErrUserNotFound struct {
 }
 
 func (e *ErrUserNotFound) Error() string {
-	return fmt.Sprintf("user:%v not found", e.ID)
+	return fmt.Sprintf("user:'%v' not found", e.ID)
 }
 
 type ErrUserIsNotAuthorOfQuestion struct {

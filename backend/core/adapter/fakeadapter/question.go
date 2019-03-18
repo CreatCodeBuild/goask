@@ -61,7 +61,7 @@ func (d *QuestionDAO) UpdateQuestion(p entity.QuestionUpdate) (entity.Question, 
 }
 
 func (d *QuestionDAO) DeleteQuestion(userID entity.ID, questionID entity.ID) (entity.Question, error) {
-	// todo: what is the semantics of deleting a question. Are the answers associated with it deleted as well?
+	
 	_, err := d.userDAO.UserByID(userID)
 	if err != nil {
 		return entity.Question{}, err

@@ -29,6 +29,11 @@ func (u User) Questions() ([]Question, error) {
 	return QuestionAll(questions, u.stdResolver), err
 }
 
+func (u User) AnswerCount() (int32, error) {
+	count, err := u.stdResolver.UserDAO.AnswerCount(u.entity.ID)
+	return int32(count), err
+}
+
 func UserOne(user entity.User, stdResolver stdResolver) User {
 	return User{entity: user, stdResolver: stdResolver}
 }

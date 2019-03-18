@@ -37,4 +37,5 @@ type User {
     name: String!
     questionCount: Int!
     questions: [Question!]!
+    answerCount: Int!
 }

@@ -51,3 +51,10 @@ func (d *UserDAO) QuestionsOfUser(ID entity.ID) ([]entity.Question, error) {
 	}
 	return ret, nil
 }
+
+func (d *UserDAO) AnswerCount(ID entity.ID) (int, error) {
+	qs := d.data.answers.Filter(func(q entity.Answer) bool {
+		return q.AuthorID == ID
+	})
+	return len(qs), nil
+}
