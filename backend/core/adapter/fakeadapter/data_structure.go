@@ -185,7 +185,7 @@ type Answers []entity.Answer
 func (a *Answers) Add(QuestionID entity.ID, Content string, AuthorID entity.ID) entity.Answer {
 	// todo: serialize
 	*a = append(*a, entity.Answer{
-		ID:         entity.NewIDInt(len(*a) + 1),
+		ID:         entity.NewIDUint(uint64(len(*a) + 1)), // todo: move the construction of Answer up
 		Content:    Content,
 		QuestionID: QuestionID,
 		AuthorID:   AuthorID,

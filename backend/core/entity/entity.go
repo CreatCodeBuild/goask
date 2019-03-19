@@ -19,8 +19,8 @@ type User struct {
 
 type ID string
 
-func NewIDInt(id int) ID {
-	return ID(strconv.FormatInt(int64(id), 10))
+func NewIDUint(id uint64) ID {
+	return ID(strconv.FormatUint(id, 10))
 }
 
 func NewIDString(id string) ID {

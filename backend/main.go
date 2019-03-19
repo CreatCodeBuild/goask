@@ -5,6 +5,7 @@ import (
 	"goask/core/adapter"
 	"goask/core/adapter/fakeadapter"
 	"goask/graphqlhelper"
+	"goask/id"
 	"goask/resolver"
 	"net/http"
 	"time"
@@ -70,7 +71,7 @@ func prepareDataAccessObjects() (adapter.UserDAO, adapter.AnswerDAO, adapter.Que
 	data, err := fakeadapter.NewData(fakeadapter.NewFileSerializer("./data.json"))
 	userDAO := fakeadapter.NewUserDAO(data)
 	answerDAO := fakeadapter.NewAnswerDAO(data)
-	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO, id.NewGenerator()) // todo: use persistent implementation
 	searcher := fakeadapter.NewSearcher(data)
 	tagDAO := fakeadapter.NewTagDAO(data)
 	return userDAO, answerDAO, questionDAO, searcher, tagDAO, err

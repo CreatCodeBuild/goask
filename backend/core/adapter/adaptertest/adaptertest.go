@@ -10,7 +10,38 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.AnswerDAO, userDAO adapter.UserDAO, tagDAO adapter.TagDAO) {
+func Delete(t *testing.T, NewDAO NewDAO) {
+	questionDAO, _, userDAO, _ := NewDAO(t)
+
+	_, err := questionDAO.DeleteQuestion("2", "1")
+	require.EqualError(t, err, "user:'2' not found")
+
+	userDAO.CreateUser("user 1")
+	questionDAO.CreateQuestion(entity.Question{AuthorID: "1"}, nil)
+
+	user, err := userDAO.CreateUser("user 2")
+	require.NoError(t, err)
+
+	_, err = questionDAO.DeleteQuestion(user.ID, "1")
+	require.EqualError(t, err, "user:2 is not authorized to delete question:1")
+
+	question, err := questionDAO.DeleteQuestion("1", "1")
+	require.NoError(t, err)
+	require.Equal(t, entity.Question{AuthorID: "1", ID: "1"}, question)
+
+	_, err = questionDAO.QuestionByID("1")
+	require.EqualError(t, err, "question:1 not found")
+
+	answers, err := questionDAO.Answers("1") // The answers associated with this question should be deleted as well
+	require.NoError(t, err)
+	require.Empty(t, answers)
+}
+
+type NewDAO func(t *testing.T) (questionDAO adapter.QuestionDAO, answerDAO adapter.AnswerDAO, userDAO adapter.UserDAO, tagDAO adapter.TagDAO)
+
+func All(t *testing.T, NewDAO NewDAO) {
+
+	questionDAO, answerDAO, userDAO, tagDAO := NewDAO(t)
 
 	t.Run("create questions", func(t2 *testing.T) {
 		_, err := questionDAO.CreateQuestion(entity.Question{AuthorID: "x"}, nil)
@@ -58,29 +89,8 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		})
 	})
 
-	t.Run("delete questions", func(t2 *testing.T) {
-		_, err := questionDAO.DeleteQuestion("2", "1")
-		require.EqualError(t, err, "user:'2' not found")
-
-		user, err := userDAO.CreateUser("user 2")
-		require.NoError(t, err)
-
-		_, err = questionDAO.DeleteQuestion(user.ID, "1")
-		require.EqualError(t, err, "user:2 is not authorized to delete question:1")
-
-		question, err := questionDAO.DeleteQuestion("1", "1")
-		require.NoError(t, err)
-		require.Equal(t, entity.Question{AuthorID: "1", ID: "1"}, question)
-
-		_, err = questionDAO.QuestionByID("1")
-		require.EqualError(t, err, "question:1 not found")
-
-		answers, err := questionDAO.Answers("1") // The answers associated with this question should be deleted as well
-		require.NoError(t, err)
-		require.Empty(t, answers)
-	})
-
 	t.Run("questions should have unique IDs", func(t2 *testing.T) {
+		questionDAO, _, userDAO, _ := NewDAO(t)
 		questions, user := setupOneUserAndThreeQuestions(t, questionDAO, userDAO)
 		_, err := questionDAO.DeleteQuestion(user.ID, questions[2].ID)
 		require.NoError(t, err)
@@ -88,7 +98,7 @@ func All(t *testing.T, questionDAO adapter.QuestionDAO, answerDAO adapter.Answer
 		q, err := questionDAO.CreateQuestion(entity.Question{AuthorID: user.ID}, nil)
 		require.NoError(t, err)
 
-		require.NotEqual(t, questions[2].ID, q.ID)
+		require.NotEqual(t, questions[2].ID, q.ID) // todo: I need to think about if adding a unique ID generator or deleted_at field to do fake delete.
 	})
 
 	t.Run("vote a question", func(t2 *testing.T) {
