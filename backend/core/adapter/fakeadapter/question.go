@@ -7,13 +7,18 @@ import (
 	"github.com/pkg/errors"
 )
 
+type nextID interface {
+	ID() (uint64, error)
+}
+
 type QuestionDAO struct {
 	data    *Data
 	userDAO *UserDAO
+	idGen   nextID
 }
 
-func NewQuestionDAO(data *Data, userDAO *UserDAO) *QuestionDAO {
-	return &QuestionDAO{data, userDAO}
+func NewQuestionDAO(data *Data, userDAO *UserDAO, idGen nextID) *QuestionDAO {
+	return &QuestionDAO{data, userDAO, idGen}
 }
 
 func (d *QuestionDAO) QuestionByID(ID entity.ID) (entity.Question, error) {
@@ -31,7 +36,12 @@ func (d *QuestionDAO) CreateQuestion(q entity.Question, tags []entity.Tag) (enti
 		return entity.Question{}, err
 	}
 
-	q.ID = entity.NewIDInt(len(d.data.questions) + 1)
+	id, err := d.idGen.ID()
+	if err != nil {
+		return entity.Question{}, errors.WithStack(err)
+	}
+
+	q.ID = entity.NewIDUint(id)
 	d.data.questions = append(d.data.questions, q)
 	d.data.tags.UpdateQuestion(q.ID, tags)
 
@@ -61,7 +71,7 @@ func (d *QuestionDAO) UpdateQuestion(p entity.QuestionUpdate) (entity.Question, 
 }
 
 func (d *QuestionDAO) DeleteQuestion(userID entity.ID, questionID entity.ID) (entity.Question, error) {
-	// todo: what is the semantics of deleting a question. Are the answers associated with it deleted as well?
+
 	_, err := d.userDAO.UserByID(userID)
 	if err != nil {
 		return entity.Question{}, err

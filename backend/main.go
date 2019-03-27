@@ -5,6 +5,7 @@ import (
 	"goask/core/adapter"
 	"goask/core/adapter/fakeadapter"
 	"goask/graphqlhelper"
+	"goask/id"
 	"goask/resolver"
 	"net/http"
 	"time"
@@ -68,9 +69,14 @@ func prepareSchmea() (string, error) {
 func prepareDataAccessObjects() (adapter.UserDAO, adapter.AnswerDAO, adapter.QuestionDAO, adapter.Searcher, adapter.TagDAO, error) {
 	// Initialize adapters
 	data, err := fakeadapter.NewData(fakeadapter.NewFileSerializer("./data.json"))
+	if err != nil {
+		return nil, nil, nil, nil, nil, err
+	}
+	idGen, err := id.NewGeneratorFromFile("id.json") // todo: move this to global dependency injection
+
 	userDAO := fakeadapter.NewUserDAO(data)
 	answerDAO := fakeadapter.NewAnswerDAO(data)
-	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO)
+	questionDAO := fakeadapter.NewQuestionDAO(data, userDAO, idGen)
 	searcher := fakeadapter.NewSearcher(data)
 	tagDAO := fakeadapter.NewTagDAO(data)
 	return userDAO, answerDAO, questionDAO, searcher, tagDAO, err
