@@ -24,6 +24,7 @@ export class QuestionsComponent implements OnInit {
     this.graphqlService.queryQuestions(userID).subscribe( // get current user? global state management?
       (result) => { 
         this.questions = this.questions.concat(result.data.action.questions)
+        console.log(this.questions)
       }
     )
   }

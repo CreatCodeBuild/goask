@@ -19,6 +19,7 @@ import { UserSummaryComponent } from './user-summary/user-summary.component';
 import { SigninComponent } from './signin/signin.component';
 import { SignupComponent } from './signup/signup.component';
 import { UserMeComponent } from './user-me/user-me.component';
+import { TagsComponent } from './tags/tags.component';
 
 const routes: Routes = [
   {
@@ -59,7 +60,8 @@ const routes: Routes = [
     UserSummaryComponent,
     SigninComponent,
     SignupComponent,
-    UserMeComponent
+    UserMeComponent,
+    TagsComponent
   ],
   imports: [
     BrowserModule,

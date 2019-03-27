@@ -2,6 +2,8 @@
   <li *ngFor="let q of questions" class="card" style="width: 18rem;">
     <div class="card-body">
       <h5 class="card-title">{{ q.title }}</h5>
+      <!-- <button type="button" class="btn btn-light">{{ q.tags }}</button>  todo: add tags component to render tags -->
+      <app-tags></app-tags>
       <p class="card-text">{{ q.content }}</p>
       <button type="button" class="btn btn-secondary" routerLink="/question/{{q.id}}">Detail</button>
     </div>

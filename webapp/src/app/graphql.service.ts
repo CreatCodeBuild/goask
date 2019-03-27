@@ -19,6 +19,9 @@ export class GraphqlService {
             id
             title
             content
+            tags {
+              value
+            }
           }
         }
       }
@@ -139,12 +142,13 @@ interface Action {
   question?: Question
 }
 
-export interface  Question {
+export interface Question {
   id: string
   title: string
   content: string
   author: User
   answers: Answer[]
+  tags: Tag[]
 }
 
 export interface User {
@@ -159,4 +163,8 @@ export interface Answer {
   id: string
   content: string
   author: User
+}
+
+export interface Tag {
+  value: string
 }
