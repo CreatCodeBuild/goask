@@ -63,6 +63,7 @@ func All(t *testing.T, NewDAO NewDAO) {
 			tags, err := questionDAO.Tags(q.ID)
 			require.NoError(t, err)
 			require.Equal(t, entity.TagSet{"Go1": struct{}{}, "Go2": struct{}{}}, tags)
+			require.NotEqual(t, q.ID, question.ID) // different questions should have different ID
 		})
 	})
 

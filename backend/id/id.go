@@ -24,7 +24,7 @@ type PersistentGenerator struct {
 	filename string
 }
 
-func (g PersistentGenerator) ID() (id uint64, err error) {
+func (g *PersistentGenerator) ID() (id uint64, err error) {
 	defer func() {
 		b, err2 := json.Marshal(g.Generator)
 		if err2 != nil {
