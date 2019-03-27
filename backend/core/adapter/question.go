@@ -9,7 +9,7 @@ import (
 type QuestionDAO interface {
 	// CRUD
 	QuestionByID(ID entity.ID) (entity.Question, error)
-	CreateQuestion(post entity.Question, tags []entity.Tag) (entity.Question, error) // todo: change the signature to support tag
+	CreateQuestion(post entity.Question, tags []entity.Tag) (entity.Question, error)
 	UpdateQuestion(post entity.QuestionUpdate) (entity.Question, error)
 
 	// DeleteQuestion deletes a question and associated answers as well?
