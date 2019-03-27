@@ -5,6 +5,7 @@ import (
 	"goask/core/adapter"
 	"goask/core/adapter/fakeadapter"
 	"goask/graphqlhelper"
+	"goask/graphqlhelper/graphiql"
 	"goask/id"
 	"goask/resolver"
 	"net/http"
@@ -89,6 +90,7 @@ func prepareServer(schema *graphqlhelper.LoggableSchema, logger *logger.Logger) 
 	// Initialize mux router
 	r := mux.NewRouter()
 	r.Handle("/query", handler)
+	r.Handle("/ide", graphiql.HandlerFunc())
 
 	return &http.Server{
 		Addr:           ":8080",
