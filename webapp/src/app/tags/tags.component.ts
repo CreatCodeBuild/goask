@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { Tag } from '../graphql.service';
 
 @Component({
   selector: 'app-tags',
@@ -7,7 +8,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TagsComponent implements OnInit {
 
-  constructor() { }
+  @Input() private tags: Tag[]
+
+  constructor(
+    
+  ) { }
 
   ngOnInit() {
   }
