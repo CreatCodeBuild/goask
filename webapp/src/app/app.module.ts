@@ -45,6 +45,10 @@ const routes: Routes = [
   {
     path: 'signup',
     component: SignupComponent,
+  },
+  {
+    path: 'tag/:value/questions',
+    component: QuestionsComponent,
   }
 ];
 
