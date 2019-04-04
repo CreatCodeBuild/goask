@@ -96,6 +96,7 @@ type dataSerialization struct {
 	Questions Questions
 	Answers   Answers
 	Users     []entity.User
+	Tags      Tags
 }
 
 func (d *Data) serialize() error {
@@ -103,13 +104,13 @@ func (d *Data) serialize() error {
 		Questions: d.questions,
 		Answers:   d.answers,
 		Users:     d.users,
+		Tags:      d.tags,
 	}
 
 	b, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
 	return d.storage.Serialize(b)
 }
 
@@ -131,6 +132,7 @@ func (d *Data) deserialize() error {
 	d.questions = data.Questions
 	d.answers = data.Answers
 	d.users = data.Users
+	d.tags = data.Tags
 	return nil
 }
 

@@ -1,7 +1,10 @@
 package fakeadapter
 
 import (
+	"encoding/json"
 	"goask/core/entity"
+
+	"github.com/pkg/errors"
 )
 
 type questionTag struct {
@@ -67,6 +70,32 @@ func (set questionTagSet) Slice() []questionTag {
 
 type Tags struct {
 	tags questionTagSet
+}
+
+func (t Tags) MarshalJSON() ([]byte, error) {
+	jsonMapped := make([][2]string, len(t.tags))
+
+	i := 0
+	for tag, _ := range t.tags {
+		jsonMapped[i] = [2]string{tag.questionID.String(), string(tag.tag)}
+		i++
+	}
+
+	b, err := json.Marshal(jsonMapped)
+	return b, errors.WithStack(err)
+}
+
+func (t *Tags) UnmarshalJSON(b []byte) error {
+	jsonMapped := make([][2]string, 0)
+
+	err := json.Unmarshal(b, &jsonMapped)
+
+	t.tags = make(questionTagSet)
+	for _, tag := range jsonMapped {
+		t.tags.Add(questionTag{questionID: entity.ID(tag[0]), tag: entity.Tag(tag[1])})
+	}
+
+	return errors.WithStack(err)
 }
 
 // GetQuestionIDs returns all questionIDs this tag is associated with.
